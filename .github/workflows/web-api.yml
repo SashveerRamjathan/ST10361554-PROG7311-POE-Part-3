@@ -1,0 +1,36 @@
+# GitHub Actions workflow for building the ASP.NET Core Web API
+
+name: Web API Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-web-api:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-webapi-${{ hashFiles('**/WebApi.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-webapi-
+
+    - name: Restore dependencies
+      run: dotnet restore Agri_Energy_Connect_API/Agri_Energy_Connect_API.csproj
+
+    - name: Build Web API
+      run: dotnet build Agri_Energy_Connect_API/Agri_Energy_Connect_API.csproj --no-restore --configuration Release
