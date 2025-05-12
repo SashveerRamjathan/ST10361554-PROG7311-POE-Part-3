@@ -1,0 +1,41 @@
+# GitHub Actions workflow for building the ASP.NET Core MVC Web App
+
+name: Web App Build
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build-web-app:
+    runs-on: ubuntu-latest
+
+    steps:
+    # Step 1: Checkout the code from the repo
+    - name: Checkout repository
+      uses: actions/checkout@v4
+
+    # Step 2: Setup the .NET SDK (version 8.0)
+    - name: Setup .NET SDK
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    # Step 3: Cache NuGet packages for faster installs on future runs
+    - name: Cache NuGet packages
+      uses: actions/cache@v4
+      with:
+        path: ~/.nuget/packages
+        key: ${{ runner.os }}-nuget-webapp-${{ hashFiles('**/Agri-Energy Connect.csproj') }}
+        restore-keys: |
+          ${{ runner.os }}-nuget-webapp-
+
+    # Step 4: Restore NuGet dependencies (quoted path due to space in folder name)
+    - name: Restore dependencies
+      run: dotnet restore "ST10361554_PROG7311_POE/Agri-Energy Connect/Agri-Energy Connect.csproj"
+
+    # Step 5: Build the application in Release mode
+    - name: Build Web App
+      run: dotnet build "ST10361554_PROG7311_POE/Agri-Energy Connect/Agri-Energy Connect.csproj" --no-restore --configuration Release
