@@ -13,10 +13,13 @@ namespace Agri_Energy_Connect.Controllers
     {
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IConfiguration _configuration;
-        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration)
+        private readonly ILogger<AccountController> _logger;
+
+        public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AccountController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _configuration = configuration;
+            _logger = logger;
         }
 
         // GET: /Account/Login
@@ -33,6 +36,12 @@ namespace Agri_Energy_Connect.Controllers
         {
             if (!ModelState.IsValid)
             {
+                // Log the model state errors
+                foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
+                {
+                    _logger.LogError(error.ErrorMessage);
+                }
+
                 return View(model);
             }
 
@@ -43,6 +52,9 @@ namespace Agri_Energy_Connect.Controllers
 
             var response = await client.PostAsync("/api/auth/login", content);
 
+            // Log that the request was sent
+            _logger.LogInformation($"Login request sent to API with email: {model.Email}");
+
             if (response.IsSuccessStatusCode)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
@@ -51,10 +63,14 @@ namespace Agri_Energy_Connect.Controllers
                 if (tokenObj.token == null)
                 {
                     ModelState.AddModelError(string.Empty, "Login failed: Token not received.");
+                    _logger.LogError("Login failed: Token not received.");
                     return View(model);
                 }
 
                 string token = tokenObj.token.ToString();
+
+                // Log the received token
+                _logger.LogInformation($"Received token: {token}");
 
                 // Decode token
                 var handler = new JwtSecurityTokenHandler();
@@ -92,6 +108,9 @@ namespace Agri_Energy_Connect.Controllers
 
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
 
+                // Log successful login
+                _logger.LogInformation($"User {model.Email} logged in successfully.");
+
                 return RedirectToAction("Index", "Home");
 
             }
@@ -99,6 +118,7 @@ namespace Agri_Energy_Connect.Controllers
             // Read error message from API if available
             var errorResponse = await response.Content.ReadAsStringAsync();
             ModelState.AddModelError(string.Empty, $"Login failed: {errorResponse}");
+            _logger.LogError($"Login failed: {errorResponse}");
 
             return View(model);
         }
@@ -108,7 +128,12 @@ namespace Agri_Energy_Connect.Controllers
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+
             Response.Cookies.Delete("AuthToken"); // Clear the AuthToken cookie
+
+            // Log successful logout
+            _logger.LogInformation("User logged out successfully.");
+
             return RedirectToAction("Index", "Home");
         }
 
@@ -119,6 +144,57 @@ namespace Agri_Energy_Connect.Controllers
             return View();
         }
 
-        // GET: Account/Register
+        // GET: Account/RegisterFarmer
+        [HttpGet]
+        public IActionResult RegisterFarmer()
+        {
+            return View();
+        }
+
+        // POST: Account/RegisterFarmer
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RegisterFarmer(FarmerRegisterViewModel model)
+        {
+            _logger.LogInformation($"Farmer registration attempt for email: {model.EmailAddress}");
+
+            if (!ModelState.IsValid)
+            {
+                _logger.LogWarning($"Farmer registration failed due to invalid model state for email: {model.EmailAddress}");
+                return View(model);
+            }
+
+            try
+            {
+                var client = _httpClientFactory.CreateClient("AgriEnergyAPI");
+                var jsonContent = JsonConvert.SerializeObject(model);
+                var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+                _logger.LogDebug($"Sending registration request to API for email: {model.EmailAddress}");
+
+                var response = await client.PostAsync("/api/auth/register/farmer", content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    _logger.LogInformation($"Farmer registered successfully via API for email: {model.EmailAddress}");
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                var errorResponse = await response.Content.ReadAsStringAsync();
+                
+                _logger.LogError($"Farmer registration failed via API for email: {model.EmailAddress}. Response: {errorResponse}");
+
+                ModelState.AddModelError(string.Empty, $"Registration failed: {errorResponse}");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, $"Unexpected error occurred while registering farmer with email: {model.EmailAddress}");
+
+                ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
+            }
+
+            return View(model);
+        }
     }
 }
