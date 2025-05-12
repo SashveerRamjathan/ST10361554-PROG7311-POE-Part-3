@@ -1,0 +1,16 @@
+﻿@{
+    ViewData["Title"] = "Access Denied";
+}
+
+<!-- Main heading for the access denied page -->
+<h2 style="color:red">Access Denied</h2>
+
+<!-- Message indicating lack of permission -->
+<p style="color:red">You do not have permission to access this page.</p>
+
+<!-- Logout button to allow the user to log out -->
+<div>
+    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+        <button type="submit" class="btn btn-primary">Logout</button>
+    </form>
+</div>

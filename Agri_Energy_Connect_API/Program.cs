@@ -78,7 +78,8 @@ namespace Agri_Energy_Connect_API
             using (var scope = app.Services.CreateScope())
             {
                 var services = scope.ServiceProvider;
-                await SeedRolesAsync(services); // Seed roles here
+                await SeedRolesAsync(services); // Seed user roles
+                await SeedAdminUserAsync(services); // Seed employee user
             }
 
             app.Run();
@@ -95,6 +96,45 @@ namespace Agri_Energy_Connect_API
                 if (!await roleManager.RoleExistsAsync(roleName))
                 {
                     await roleManager.CreateAsync(new IdentityRole(roleName));
+                }
+            }
+        }
+
+        public static async Task SeedAdminUserAsync(IServiceProvider serviceProvider)
+        {
+            var userManager = serviceProvider.GetRequiredService<UserManager<ApplicationUser>>();
+            var roleManager = serviceProvider.GetRequiredService<RoleManager<IdentityRole>>();
+
+            var defaultEmail = "employee@agrienergy.com"; // Default email for the employee
+            var defaultPassword = "Password123!"; // Default password for the employee
+            var fullName = "John Doe"; // Default full name of the employee
+            var phoneNumber = "083-678-6545"; // Default phone number for the employee
+
+            // Check if the user already exists
+            var user = await userManager.FindByEmailAsync(defaultEmail);
+
+            if (user == null)
+            {
+                user = new ApplicationUser
+                {
+                    UserName = defaultEmail,
+                    Email = defaultEmail,
+                    FullName = fullName,
+                    PhoneNumber = phoneNumber,
+                    Address = "123 Agri Energy St, Greenfield" // Add a default address if necessary
+                };
+
+                var createResult = await userManager.CreateAsync(user, defaultPassword);
+
+                if (!createResult.Succeeded)
+                {
+                    throw new Exception("Failed to create the user.");
+                }
+
+                // Assign the employee role
+                if (!await userManager.IsInRoleAsync(user, RolesEnum.Employee.ToString()))
+                {
+                    await userManager.AddToRoleAsync(user, RolesEnum.Employee.ToString());
                 }
             }
         }
