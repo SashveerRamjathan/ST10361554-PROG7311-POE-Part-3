@@ -119,5 +119,6 @@ namespace Agri_Energy_Connect.Controllers
             return View();
         }
 
+        // GET: Account/Register
     }
 }

@@ -19,10 +19,6 @@ namespace DataContextAndModels.ViewModels
             ErrorMessage = "Password must contain at least one uppercase letter, one lowercase letter, one number, and one special character.")]
         public string Password { get; set; }
 
-
-        [Required(ErrorMessage = "Profile Picture is required")]
-         public string ProfilePicture { get; set; }
-
         [Required(ErrorMessage = "Address is required")]
         public string Address { get; set; }
 

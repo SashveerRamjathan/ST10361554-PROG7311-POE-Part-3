@@ -33,7 +33,6 @@ namespace Agri_Energy_Connect_API.Controllers
             { 
                 UserName = model.EmailAddress, 
                 Email = model.EmailAddress,
-                ProfilePicture = model.ProfilePicture,
                 Address = model.Address,
                 FullName = model.FullName,
                 PhoneNumber = model.PhoneNumber
