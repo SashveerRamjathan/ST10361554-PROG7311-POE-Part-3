@@ -34,8 +34,8 @@ jobs:
 
     # Step 4: Restore NuGet dependencies (quoted path due to space in folder name)
     - name: Restore dependencies
-      run: dotnet restore "ST10361554_PROG7311_POE/Agri-Energy Connect/Agri-Energy Connect.csproj"
+      run: dotnet restore "Agri-Energy Connect/Agri-Energy Connect.csproj"
 
     # Step 5: Build the application in Release mode
     - name: Build Web App
-      run: dotnet build "ST10361554_PROG7311_POE/Agri-Energy Connect/Agri-Energy Connect.csproj" --no-restore --configuration Release
+      run: dotnet build "Agri-Energy Connect/Agri-Energy Connect.csproj" --no-restore --configuration Release
