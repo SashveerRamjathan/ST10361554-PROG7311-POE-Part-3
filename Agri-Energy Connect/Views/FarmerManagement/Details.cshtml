@@ -1,0 +1,63 @@
+﻿@model DataContextAndModels.ViewModels.FarmerUpdateViewModel
+
+@{
+    ViewData["Title"] = "Farmer Details";
+}
+
+<div class="container mt-4">
+
+    @* Success Message *@
+    @if (ViewData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @ViewData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Error Message *@
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @ViewData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card shadow rounded-3">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <i class="bi bi-person-fill fs-4 me-2"></i>
+            <h4 class="mb-0">Farmer Details</h4>
+        </div>
+        <div class="card-body">
+            <div class="mb-3">
+                <label class="form-label">Full Name</label>
+                <input asp-for="FullName" class="form-control" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Email Address</label>
+                <input asp-for="EmailAddress" class="form-control" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Phone Number</label>
+                <input asp-for="PhoneNumber" class="form-control" readonly />
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Address</label>
+                <input asp-for="Address" class="form-control" readonly />
+            </div>
+        </div>
+        <div class="card-footer d-flex justify-content-end gap-2">
+            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-success">
+                <i class="bi bi-pencil-square"></i> Update Farmer
+            </a>
+            <a asp-action="Index" class="btn btn-secondary">
+                <i class="bi bi-arrow-left"></i> Back
+            </a>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

@@ -9,6 +9,8 @@ namespace DataContextAndModels.ViewModels
 {
     public class FarmerUpdateViewModel
     {
+        public string Id { get; set; }
+
         [EmailAddress(ErrorMessage = "Email Address is not valid")]
         [Required(ErrorMessage = "Email is required")]
         public string EmailAddress { get; set; }

@@ -1,0 +1,105 @@
+﻿@model DataContextAndModels.ViewModels.FarmerUpdateViewModel
+
+@{
+    ViewData["Title"] = "Update Farmer";
+}
+
+<div class="container mt-5">
+    <div class="card shadow-lg border-0 rounded-4">
+        <div class="card-header bg-primary text-white rounded-top-4">
+            <h4 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Update Farmer Details</h4>
+        </div>
+
+        <form id="updateForm" asp-action="Update" asp-controller="FarmerManagement" method="post">
+            <div class="card-body px-4 py-3">
+
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="FullName" class="form-label fw-semibold"></label>
+                    <input asp-for="FullName" class="form-control rounded-3" />
+                    <span asp-validation-for="FullName" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="EmailAddress" class="form-label fw-semibold"></label>
+                    <input asp-for="EmailAddress" class="form-control rounded-3" />
+                    <span asp-validation-for="EmailAddress" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
+                    <input asp-for="PhoneNumber" class="form-control rounded-3" />
+                    <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Address" class="form-label fw-semibold"></label>
+                    <input asp-for="Address" class="form-control rounded-3" />
+                    <span asp-validation-for="Address" class="text-danger small"></span>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex justify-content-between px-4 py-3 bg-light border-top rounded-bottom-4">
+                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
+                    <i class="bi bi-save"></i> Review & Confirm
+                </button>
+                <a asp-action="Index" asp-controller="FarmerManagement" class="btn btn-secondary">
+                    <i class="bi bi-x-circle"></i> Cancel
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered modal-lg">
+        <div class="modal-content shadow">
+            <div class="modal-header bg-warning text-dark">
+                <h5 class="modal-title" id="confirmUpdateModalLabel">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Update
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">You're about to update the following farmer details:</p>
+                <ul class="list-group">
+                    <li class="list-group-item"><strong>Full Name:</strong> <span id="modalFullName"></span></li>
+                    <li class="list-group-item"><strong>Email Address:</strong> <span id="modalEmailAddress"></span></li>
+                    <li class="list-group-item"><strong>Phone Number:</strong> <span id="modalPhoneNumber"></span></li>
+                    <li class="list-group-item"><strong>Address:</strong> <span id="modalAddress"></span></li>
+                </ul>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
+                    Cancel
+                </button>
+                <button type="button" class="btn btn-success" onclick="submitForm()">
+                    <i class="bi bi-check-circle-fill me-1"></i>Confirm Update
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        const form = document.getElementById("updateForm");
+
+        function submitForm() {
+            const modal = bootstrap.Modal.getInstance(document.getElementById('confirmUpdateModal'));
+            modal.hide();
+            form.submit();
+        }
+
+        // Populate modal with form values
+        document.querySelector('[data-bs-target="#confirmUpdateModal"]').addEventListener('click', () => {
+            document.getElementById("modalFullName").innerText = document.getElementById("FullName").value;
+            document.getElementById("modalEmailAddress").innerText = document.getElementById("EmailAddress").value;
+            document.getElementById("modalPhoneNumber").innerText = document.getElementById("PhoneNumber").value;
+            document.getElementById("modalAddress").innerText = document.getElementById("Address").value;
+        });
+    </script>
+}

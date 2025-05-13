@@ -4,44 +4,71 @@
     ViewData["Title"] = "Farmer Management";
 }
 
-<h2 class="mb-4">Manage Farmer Accounts</h2>
+<div class="container mt-4">
 
-<div class="mb-4">
-    <a asp-controller="Account" asp-action="RegisterFarmer" class="btn btn-primary">
-        <i class="bi bi-person-plus"></i> Register Farmer
-    </a>
-</div>
+    <h2 class="mb-4">Manage Farmer Accounts</h2>
 
-@if (ViewData["ErrorMessage"] != null)
-{
-    <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
-}
-else if (!Model.Any())
-{
-    <div class="alert alert-info">No farmers available.</div>
-}
-else
-{
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        @foreach (var farmer in Model)
-        {
-            <div class="col">
-                <div class="card h-100 shadow-sm">
-                    <div class="card-header bg-success text-white">
-                        <h5 class="card-title mb-0">@farmer.FullName</h5>
-                    </div>
-                    <div class="card-body">
-                        <p class="mb-2"><strong>Email:</strong> @farmer.Email</p>
-                        <p class="mb-2"><strong>Phone:</strong> @farmer.PhoneNumber</p>
-                        <p class="mb-0"><strong>Address:</strong> @farmer.Address</p>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between">
-                        <a asp-controller="FarmerManagement" asp-action="Edit" asp-route-id="@farmer.Id" class="btn btn-warning btn-sm">Update</a>
-                        <a asp-controller="FarmerManagement" asp-action="Delete" asp-route-id="@farmer.Id" class="btn btn-danger btn-sm">Delete</a>
-                        <a asp-controller="Product" asp-action="FarmerProducts" asp-route-farmerId="@farmer.Id" class="btn btn-info btn-sm">View Products</a>
+    @* Success Message *@
+    @if (ViewData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @ViewData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Error Message *@
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @ViewData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="mb-4 d-flex justify-content-start">
+        <a asp-controller="Account" asp-action="RegisterFarmer" class="btn btn-primary">
+            <i class="bi bi-person-plus"></i> Register Farmer
+        </a>
+    </div>
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No farmers available.</div>
+    }
+    else
+    {
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var farmer in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">@farmer.FullName</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><strong>Email:</strong> @farmer.Email</p>
+                            <p class="mb-2"><strong>Phone:</strong> @farmer.PhoneNumber</p>
+                            <p class="mb-0"><strong>Address:</strong> @farmer.Address</p>
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between gap-2">
+                            <a asp-controller="FarmerManagement" asp-action="Update" asp-route-id="@farmer.Id" class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil-square"></i> Update
+                            </a>
+                            <a asp-controller="FarmerManagement" asp-action="Delete" asp-route-id="@farmer.Id" class="btn btn-danger btn-sm">
+                                <i class="bi bi-trash"></i> Delete
+                            </a>
+                            <a asp-controller="Product" asp-action="FarmerProducts" asp-route-farmerId="@farmer.Id" class="btn btn-info btn-sm">
+                                <i class="bi bi-box-seam"></i> View Products
+                            </a>
+                        </div>
                     </div>
                 </div>
-            </div>
-        }
-    </div>
+            }
+        </div>
+    }
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
 }
