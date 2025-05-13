@@ -1,0 +1,47 @@
+﻿@model List<ApplicationUser>
+
+@{
+    ViewData["Title"] = "Farmer Management";
+}
+
+<h2 class="mb-4">Manage Farmer Accounts</h2>
+
+<div class="mb-4">
+    <a asp-controller="Account" asp-action="RegisterFarmer" class="btn btn-primary">
+        <i class="bi bi-person-plus"></i> Register Farmer
+    </a>
+</div>
+
+@if (ViewData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">@ViewData["ErrorMessage"]</div>
+}
+else if (!Model.Any())
+{
+    <div class="alert alert-info">No farmers available.</div>
+}
+else
+{
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+        @foreach (var farmer in Model)
+        {
+            <div class="col">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-header bg-success text-white">
+                        <h5 class="card-title mb-0">@farmer.FullName</h5>
+                    </div>
+                    <div class="card-body">
+                        <p class="mb-2"><strong>Email:</strong> @farmer.Email</p>
+                        <p class="mb-2"><strong>Phone:</strong> @farmer.PhoneNumber</p>
+                        <p class="mb-0"><strong>Address:</strong> @farmer.Address</p>
+                    </div>
+                    <div class="card-footer d-flex justify-content-between">
+                        <a asp-controller="FarmerManagement" asp-action="Edit" asp-route-id="@farmer.Id" class="btn btn-warning btn-sm">Update</a>
+                        <a asp-controller="FarmerManagement" asp-action="Delete" asp-route-id="@farmer.Id" class="btn btn-danger btn-sm">Delete</a>
+                        <a asp-controller="Product" asp-action="FarmerProducts" asp-route-farmerId="@farmer.Id" class="btn btn-info btn-sm">View Products</a>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+}

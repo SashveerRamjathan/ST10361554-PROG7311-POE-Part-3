@@ -13,8 +13,6 @@ namespace Agri_Energy_Connect_API.Controllers
     public class FarmerAccountController : ControllerBase
     {
         private readonly UserManager<ApplicationUser> _userManager;
-        private readonly SignInManager<ApplicationUser> _signInManager;
-        private readonly TokenService _tokenService;
         private readonly ILogger<FarmerAccountController> _logger;
         public FarmerAccountController(
             UserManager<ApplicationUser> userManager,
@@ -23,8 +21,6 @@ namespace Agri_Energy_Connect_API.Controllers
             ILogger<FarmerAccountController> logger)
         {
             _userManager = userManager;
-            _signInManager = signInManager;
-            _tokenService = tokenService;
             _logger = logger;
         }
 
