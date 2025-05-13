@@ -6,6 +6,9 @@ using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
+using Agri_Energy_Connect.Services;
+using Microsoft.AspNetCore.Authorization;
+using System.Net;
 
 namespace Agri_Energy_Connect.Controllers
 {
@@ -58,19 +61,29 @@ namespace Agri_Energy_Connect.Controllers
             if (response.IsSuccessStatusCode)
             {
                 var responseBody = await response.Content.ReadAsStringAsync();
-                var tokenObj = JsonConvert.DeserializeObject<dynamic>(responseBody);
+                var responseObj = JsonConvert.DeserializeObject<dynamic>(responseBody);
 
-                if (tokenObj.token == null)
+                // if the response is null or doesn't contain expected properties, log the error
+                if (responseObj == null)
                 {
-                    ModelState.AddModelError(string.Empty, "Login failed: Token not received.");
-                    _logger.LogError("Login failed: Token not received.");
+                    ModelState.AddModelError(string.Empty, "Login failed: Invalid response from server.");
+                    _logger.LogError("Login failed: Invalid response from server.");
                     return View(model);
                 }
 
-                string token = tokenObj.token.ToString();
+                if (responseObj.token == null || responseObj.id == null)
+                {
+                    ModelState.AddModelError(string.Empty, "Login failed: Missing token or user ID.");
+                    _logger.LogError("Login failed: Missing token or user ID.");
+                    return View(model);
+                }
+
+                string token = responseObj.token.ToString();
+                string userId = responseObj.id.ToString();
 
                 // Log the received token
                 _logger.LogInformation($"Received token: {token}");
+                _logger.LogInformation($"User ID: {userId}");
 
                 // Decode token
                 var handler = new JwtSecurityTokenHandler();
@@ -82,6 +95,7 @@ namespace Agri_Energy_Connect.Controllers
                 // Optional: add extra claims
                 claims.Add(new Claim("AccessToken", token));
                 claims.Add(new Claim(ClaimTypes.Name, model.Email));
+                claims.Add(new Claim(ClaimTypes.NameIdentifier, userId));
 
                 // Create identity and principal
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
@@ -146,6 +160,7 @@ namespace Agri_Energy_Connect.Controllers
 
         // GET: Account/RegisterFarmer
         [HttpGet]
+        [Authorize(Roles = "Employee")]
         public IActionResult RegisterFarmer()
         {
             return View();
@@ -154,6 +169,7 @@ namespace Agri_Energy_Connect.Controllers
         // POST: Account/RegisterFarmer
         [HttpPost]
         [ValidateAntiForgeryToken]
+        [Authorize(Roles = "Employee")]
         public async Task<IActionResult> RegisterFarmer(FarmerRegisterViewModel model)
         {
             _logger.LogInformation($"Farmer registration attempt for email: {model.EmailAddress}");
@@ -167,6 +183,8 @@ namespace Agri_Energy_Connect.Controllers
             try
             {
                 var client = _httpClientFactory.CreateClient("AgriEnergyAPI");
+                client.AddJwtFromCookies(Request);
+
                 var jsonContent = JsonConvert.SerializeObject(model);
                 var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
@@ -177,15 +195,47 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     _logger.LogInformation($"Farmer registered successfully via API for email: {model.EmailAddress}");
-
+                    TempData["SuccessMessage"] = "Farmer registered successfully.";
                     return RedirectToAction("Index", "Home");
                 }
 
-                var errorResponse = await response.Content.ReadAsStringAsync();
-                
-                _logger.LogError($"Farmer registration failed via API for email: {model.EmailAddress}. Response: {errorResponse}");
+                var responseContent = await response.Content.ReadAsStringAsync();
 
-                ModelState.AddModelError(string.Empty, $"Registration failed: {errorResponse}");
+                if (response.StatusCode == HttpStatusCode.BadRequest)
+                {
+                    _logger.LogWarning($"Farmer registration failed with BadRequest for email: {model.EmailAddress}. Response: {responseContent}");
+
+                    try
+                    {
+                        // Attempt to deserialize API validation errors
+                        var apiErrors = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(responseContent);
+
+                        // if successful, add errors to ModelState
+                        if (apiErrors == null)
+                        {
+                            ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
+                            return View(model);
+                        }
+
+                        foreach (var error in apiErrors)
+                        {
+                            foreach (var msg in error.Value)
+                            {
+                                ModelState.AddModelError(error.Key, msg);
+                            }
+                        }
+                    }
+                    catch
+                    {
+                        // If not in dictionary format, treat it as plain error
+                        ModelState.AddModelError(string.Empty, responseContent);
+                    }
+                }
+                else
+                {
+                    _logger.LogError($"Unexpected API error during farmer registration. Status: {response.StatusCode}, Response: {responseContent}");
+                    ModelState.AddModelError(string.Empty, "An unexpected error occurred while processing your request.");
+                }
             }
             catch (Exception ex)
             {

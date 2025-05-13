@@ -1,3 +1,4 @@
+using Agri_Energy_Connect.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -34,10 +35,7 @@ namespace Agri_Energy_Connect
                 options.SlidingExpiration = true;
             });
 
-
             builder.Services.AddAuthorization();
-
-
 
             var app = builder.Build();
 
