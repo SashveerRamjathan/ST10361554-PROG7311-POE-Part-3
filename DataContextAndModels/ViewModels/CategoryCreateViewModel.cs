@@ -7,19 +7,8 @@ using System.Threading.Tasks;
 
 namespace DataContextAndModels.ViewModels
 {
-    public class CreateCategoryViewModel
+    public class CategoryCreateViewModel
     {
-
-        public CreateCategoryViewModel(string categoryName)
-        {
-            Id = Guid.NewGuid().ToString();
-            Name = categoryName;
-        }
-
-        [Required(ErrorMessage = "Category Id is required")]
-        public string Id { get; set; }
-
-
         [Required(ErrorMessage = "Category name is required")]
         public string Name { get; set; }
     }

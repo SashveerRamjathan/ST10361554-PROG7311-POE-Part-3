@@ -103,7 +103,7 @@ namespace Agri_Energy_Connect_API.Controllers
         // POST: api/categories
         [HttpPost]
         [Authorize]
-        public async Task<IActionResult> CreateCategory([FromBody] CreateCategoryViewModel category)
+        public async Task<IActionResult> CreateCategory([FromBody] CategoryCreateViewModel category)
         {
             try
             {
@@ -131,7 +131,7 @@ namespace Agri_Energy_Connect_API.Controllers
                 // Create a new category object
                 var newCategory = new Category
                 {
-                    Id = category.Id,
+                    Id = Guid.NewGuid().ToString(),
                     Name = category.Name
                 };
 
@@ -142,7 +142,7 @@ namespace Agri_Energy_Connect_API.Controllers
                 await _context.SaveChangesAsync();
 
                 // log the category creation
-                _logger.LogInformation($"Category created with ID: {category.Id}");
+                _logger.LogInformation($"Category created with ID: {newCategory.Id}");
 
                 // return ok response
                 return Ok();
