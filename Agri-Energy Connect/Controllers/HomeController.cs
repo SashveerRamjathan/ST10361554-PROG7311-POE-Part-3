@@ -19,7 +19,6 @@ namespace Agri_Energy_Connect.Controllers
             return View();
         }
 
-        [Authorize(Roles ="Farmer")]
         public IActionResult Privacy()
         {
             return View();
