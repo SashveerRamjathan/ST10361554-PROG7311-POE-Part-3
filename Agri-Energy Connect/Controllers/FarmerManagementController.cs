@@ -12,13 +12,11 @@ namespace Agri_Energy_Connect.Controllers
     {
 
         private readonly IHttpClientFactory _httpClientFactory;
-        private readonly IConfiguration _configuration;
         private readonly ILogger<FarmerManagementController> _logger;
 
-        public FarmerManagementController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<FarmerManagementController> logger)
+        public FarmerManagementController(IHttpClientFactory httpClientFactory, ILogger<FarmerManagementController> logger)
         {
             _httpClientFactory = httpClientFactory;
-            _configuration = configuration;
             _logger = logger;
         }
 
@@ -166,7 +164,6 @@ namespace Agri_Energy_Connect.Controllers
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> Update(string id)
         {
-            _logger.LogInformation($"Fetching farmer with ID: {id} for update.");
 
             if (string.IsNullOrEmpty(id))
             {
@@ -177,6 +174,8 @@ namespace Agri_Energy_Connect.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+
+            _logger.LogInformation($"Fetching farmer with ID: {id} for update.");
 
             try
             {

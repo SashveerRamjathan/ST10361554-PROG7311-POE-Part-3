@@ -32,7 +32,9 @@ namespace Agri_Energy_Connect_API.Controllers
                 _logger.LogInformation("Fetching all categories.");
 
                 // get all categories from the database
-                var categories = await _context.Categories.ToListAsync();
+                var categories = await _context.Categories
+                    .Include(c => c.Products)
+                    .ToListAsync();
 
                 // Check if the list is empty or null
                 if (categories == null || categories.Count == 0)
@@ -75,7 +77,10 @@ namespace Agri_Energy_Connect_API.Controllers
                 }
 
                 // get the category from the database
-                var category = await _context.Categories.FindAsync(id);
+                var category = await _context.Categories
+                        .Include(c => c.Products)
+                        .FirstOrDefaultAsync(c => c.Id == id);
+
 
                 // Check if the category is null
                 if (category == null)
@@ -120,7 +125,8 @@ namespace Agri_Energy_Connect_API.Controllers
 
                 // Check if the category already exists
                 var existingCategory = await _context.Categories
-                    .FirstOrDefaultAsync(c => c.Name.Equals(category.Name, StringComparison.OrdinalIgnoreCase));
+                        .FirstOrDefaultAsync(c => c.Name.ToLower() == category.Name.ToLower());
+
 
                 if (existingCategory != null)
                 {
@@ -145,7 +151,7 @@ namespace Agri_Energy_Connect_API.Controllers
                 _logger.LogInformation($"Category created with ID: {newCategory.Id}");
 
                 // return ok response
-                return Ok();
+                return Ok(newCategory);
             }
             catch (Exception ex)
             {
