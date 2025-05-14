@@ -26,6 +26,7 @@ namespace Agri_Energy_Connect.Controllers
 
         // GET: Products
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Index(
             string sortBy = "name_asc",
             string? category = null,
@@ -145,6 +146,7 @@ namespace Agri_Energy_Connect.Controllers
 
         // GET: Products/Details/5
         [HttpGet]
+        [Authorize]
         public async Task<IActionResult> Details(string id)
         {
 
@@ -1294,13 +1296,21 @@ namespace Agri_Energy_Connect.Controllers
         private IActionResult RedirectToRefererOrFallback()
         {
             var referer = Request.Headers["Referer"].ToString();
+
             if (!string.IsNullOrEmpty(referer))
             {
+                // Check if referer contains delete actions
+                if (referer.Contains("Delete", StringComparison.OrdinalIgnoreCase) ||
+                    referer.Contains("DeleteConfirmed", StringComparison.OrdinalIgnoreCase))
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+
                 return Redirect(referer);
             }
+
             return RedirectToAction(nameof(Index)); // Fallback if no referer
         }
-
 
         #endregion
     }
