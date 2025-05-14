@@ -2,15 +2,22 @@
     ViewData["Title"] = "Access Denied";
 }
 
-<!-- Main heading for the access denied page -->
-<h2 style="color:red">Access Denied</h2>
-
-<!-- Message indicating lack of permission -->
-<p style="color:red">You do not have permission to access this page.</p>
-
-<!-- Logout button to allow the user to log out -->
-<div>
-    <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
-        <button type="submit" class="btn btn-primary">Logout</button>
-    </form>
+<!-- Access Denied View -->
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card border-danger shadow-sm" style="max-width: 500px; width: 100%;">
+        <div class="card-header bg-danger text-white d-flex align-items-center">
+            <i class="bi bi-shield-lock-fill me-2"></i>
+            <h5 class="mb-0">Access Denied</h5>
+        </div>
+        <div class="card-body text-center">
+            <p class="text-danger fw-bold mb-3">
+                You do not have permission to access this page.
+            </p>
+            <form asp-controller="Account" asp-action="Logout" method="post" class="d-inline">
+                <button type="submit" class="btn btn-outline-danger">
+                    <i class="bi bi-box-arrow-right me-1"></i> Logout
+                </button>
+            </form>
+        </div>
+    </div>
 </div>

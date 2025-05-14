@@ -4,42 +4,55 @@
     ViewData["Title"] = "Register a New Farmer";
 }
 
-<div class="container mt-5">
-    <h2 class="mb-4">@ViewData["Title"]</h2>
-
-    <div class="card shadow-sm">
+<div class="container my-5 d-flex justify-content-center">
+    <div class="card shadow-sm w-100" style="max-width: 700px;">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <i class="bi bi-person-plus-fill me-2"></i>
+            <h5 class="mb-0">@ViewData["Title"]</h5>
+        </div>
         <div class="card-body">
-            <form asp-action="RegisterFarmer" method="post">
+            <form asp-action="RegisterFarmer" method="post" novalidate>
                 <div class="mb-3">
-                    <label asp-for="FullName" class="form-label"></label>
+                    <label asp-for="FullName" class="form-label fw-semibold">
+                        <i class="bi bi-person-fill me-1"></i> Full Name
+                    </label>
                     <input asp-for="FullName" class="form-control" />
                     <span asp-validation-for="FullName" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="EmailAddress" class="form-label"></label>
+                    <label asp-for="EmailAddress" class="form-label fw-semibold">
+                        <i class="bi bi-envelope-fill me-1"></i> Email Address
+                    </label>
                     <input asp-for="EmailAddress" class="form-control" />
                     <span asp-validation-for="EmailAddress" class="text-danger small"></span>
                 </div>
 
                 <div class="mb-3">
-                    <label asp-for="Password" class="form-label"></label>
+                    <label asp-for="Password" class="form-label fw-semibold">
+                        <i class="bi bi-lock-fill me-1"></i> Password
+                    </label>
                     <div class="input-group">
                         <input asp-for="Password" type="password" class="form-control" id="Input_Password" />
-                        <button type="button" id="togglePassword" class="btn btn-outline-secondary" onclick="togglePasswordVisibility()">Show</button>
+                        <button type="button" id="togglePassword" class="btn btn-outline-secondary" onclick="togglePasswordVisibility()">
+                            <i class="bi bi-eye-fill"></i>
+                        </button>
                     </div>
                     <span asp-validation-for="Password" class="text-danger small"></span>
                 </div>
 
-
                 <div class="mb-3">
-                    <label asp-for="PhoneNumber" class="form-label"></label>
+                    <label asp-for="PhoneNumber" class="form-label fw-semibold">
+                        <i class="bi bi-telephone-fill me-1"></i> Phone Number
+                    </label>
                     <input asp-for="PhoneNumber" class="form-control" />
                     <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Address" class="form-label"></label>
+                <div class="mb-4">
+                    <label asp-for="Address" class="form-label fw-semibold">
+                        <i class="bi bi-geo-alt-fill me-1"></i> Address
+                    </label>
                     <input asp-for="Address" class="form-control" />
                     <span asp-validation-for="Address" class="text-danger small"></span>
                 </div>
@@ -48,7 +61,7 @@
                     <a asp-controller="FarmerManagement" asp-action="Index" class="btn btn-outline-secondary">
                         <i class="bi bi-arrow-left-circle"></i> Cancel
                     </a>
-                    <button type="submit" class="btn btn-primary">
+                    <button type="submit" class="btn btn-success">
                         <i class="bi bi-person-plus-fill"></i> Register
                     </button>
                 </div>
@@ -63,18 +76,13 @@
     }
 
     <script>
-        // Toggle password visibility
         function togglePasswordVisibility() {
-            var passwordInput = document.getElementById("Input_Password");
-            var toggleButton = document.getElementById("togglePassword");
+            const passwordInput = document.getElementById("Input_Password");
+            const toggleButton = document.getElementById("togglePassword");
 
-            if (passwordInput.type === "password") {
-                passwordInput.type = "text";
-                toggleButton.textContent = "Hide";
-            } else {
-                passwordInput.type = "password";
-                toggleButton.textContent = "Show";
-            }
+            const isPassword = passwordInput.type === "password";
+            passwordInput.type = isPassword ? "text" : "password";
+            toggleButton.innerHTML = isPassword ? '<i class="bi bi-eye-slash-fill"></i>' : '<i class="bi bi-eye-fill"></i>';
         }
     </script>
 }
