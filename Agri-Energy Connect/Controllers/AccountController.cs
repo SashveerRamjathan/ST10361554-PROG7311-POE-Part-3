@@ -1,14 +1,14 @@
-﻿using DataContextAndModels.ViewModels;
-using Microsoft.AspNetCore.Authentication.Cookies;
+﻿using Agri_Energy_Connect.Services;
+using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.IdentityModel.Tokens.Jwt;
+using System.Net;
 using System.Security.Claims;
 using System.Text;
-using Agri_Energy_Connect.Services;
-using Microsoft.AspNetCore.Authorization;
-using System.Net;
 
 namespace Agri_Energy_Connect.Controllers
 {

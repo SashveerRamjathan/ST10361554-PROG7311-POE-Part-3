@@ -1,7 +1,6 @@
-using System.Diagnostics;
-using Microsoft.AspNetCore.Mvc;
 using DataContextAndModels.Models;
-using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Diagnostics;
 
 namespace Agri_Energy_Connect.Controllers
 {

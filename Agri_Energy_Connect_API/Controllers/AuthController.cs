@@ -3,10 +3,8 @@ using DataContextAndModels.Enums;
 using DataContextAndModels.Models;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Rewrite;
 
 namespace Agri_Energy_Connect_API.Controllers
 {
@@ -40,7 +38,7 @@ namespace Agri_Energy_Connect_API.Controllers
                 _logger.LogWarning($"Invalid model state for farmer registration with email: {model.EmailAddress}");
                 return BadRequest(ModelState);
             }
-            
+
             if (await _userManager.FindByEmailAsync(model.EmailAddress) != null)
             {
                 _logger.LogWarning($"User with email {model.EmailAddress} already exists.");
@@ -49,15 +47,15 @@ namespace Agri_Energy_Connect_API.Controllers
 
             _logger.LogInformation($"Farmer registration initiated by employee for email: {model.EmailAddress}");
 
-            var user = new ApplicationUser 
-            { 
-                UserName = model.EmailAddress, 
+            var user = new ApplicationUser
+            {
+                UserName = model.EmailAddress,
                 Email = model.EmailAddress,
                 Address = model.Address,
                 FullName = model.FullName,
                 PhoneNumber = model.PhoneNumber
             };
-            
+
             var result = await _userManager.CreateAsync(user, model.Password);
 
             if (!result.Succeeded)
@@ -97,9 +95,9 @@ namespace Agri_Energy_Connect_API.Controllers
 
             _logger.LogInformation($"Employee registration initiated by employee for email: {model.EmailAddress}");
 
-            var user = new ApplicationUser 
-            { 
-                UserName = model.EmailAddress, 
+            var user = new ApplicationUser
+            {
+                UserName = model.EmailAddress,
                 Email = model.EmailAddress,
                 FullName = model.FullName,
                 PhoneNumber = model.PhoneNumber
@@ -115,7 +113,7 @@ namespace Agri_Energy_Connect_API.Controllers
             }
 
             var roleResult = await _userManager.AddToRoleAsync(user, RolesEnum.Employee.ToString());
-            
+
             if (!roleResult.Succeeded)
             {
                 // Log the errors
@@ -142,7 +140,7 @@ namespace Agri_Energy_Connect_API.Controllers
             if (user == null)
             {
                 _logger.LogWarning($"User with email {model.Email} not found.");
-                return Unauthorized("User not found."); 
+                return Unauthorized("User not found.");
             }
 
             var result = await _signInManager.CheckPasswordSignInAsync(user, model.Password, false);

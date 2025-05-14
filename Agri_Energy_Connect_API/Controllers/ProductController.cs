@@ -3,7 +3,6 @@ using DataContextAndModels.DataTransferObjects;
 using DataContextAndModels.Models;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -68,8 +67,8 @@ namespace Agri_Energy_Connect_API.Controllers
                     ProductionDate = p.ProductionDate,
                     FarmerId = p.FarmerId,
                     CategoryId = p.CategoryId,
-                    FarmerName = p.Farmer.FullName!, 
-                    CategoryName = p.Category.Name 
+                    FarmerName = p.Farmer.FullName!,
+                    CategoryName = p.Category.Name
                 }).ToList();
 
                 // Return the list of products
@@ -220,7 +219,7 @@ namespace Agri_Energy_Connect_API.Controllers
                 // log the product creation
                 _logger.LogInformation($"Product created with ID: {newProduct.Id}");
 
-                return Ok(new { id = newProduct.Id}); 
+                return Ok(new { id = newProduct.Id });
             }
             catch (Exception ex)
             {

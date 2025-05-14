@@ -242,7 +242,7 @@ namespace Agri_Energy_Connect.Controllers
                     TempData["ErrorMessage"] = "No categories found for selection.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                    ViewData["CategorySelectList"] = new SelectList( new List<Category>());
+                    ViewData["CategorySelectList"] = new SelectList(new List<Category>());
                 }
 
                 // log the number of categories found
@@ -905,13 +905,13 @@ namespace Agri_Energy_Connect.Controllers
         [HttpGet]
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> FarmerProductsEmployee(
-            string id, 
+            string id,
             string sortBy = "name_asc",
             string? category = null,
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            
+
             if (string.IsNullOrEmpty(id))
             {
                 _logger.LogWarning("Farmer ID is null or empty.");

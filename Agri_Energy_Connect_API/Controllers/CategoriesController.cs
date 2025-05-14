@@ -1,9 +1,8 @@
 ﻿using DataContextAndModels.Data;
-using DataContextAndModels.Models;
 using DataContextAndModels.DataTransferObjects;
+using DataContextAndModels.Models;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -59,7 +58,7 @@ namespace Agri_Energy_Connect_API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching categories");
-                
+
                 // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }

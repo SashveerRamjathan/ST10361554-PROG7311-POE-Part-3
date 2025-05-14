@@ -1,6 +1,5 @@
 ﻿using Agri_Energy_Connect.Services;
 using DataContextAndModels.DataTransferObjects;
-using DataContextAndModels.Models;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
