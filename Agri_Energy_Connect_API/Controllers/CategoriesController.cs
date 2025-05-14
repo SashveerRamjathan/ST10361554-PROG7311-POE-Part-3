@@ -24,7 +24,6 @@ namespace Agri_Energy_Connect_API.Controllers
 
         // GET: api/categories/all
         [HttpGet("all")]
-        [Authorize]
         public async Task<IActionResult> GetAllCategories()
         {
             try

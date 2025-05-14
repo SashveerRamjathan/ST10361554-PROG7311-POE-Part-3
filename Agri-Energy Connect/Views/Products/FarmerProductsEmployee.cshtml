@@ -33,6 +33,50 @@
         </div>
     }
 
+    @if (!string.IsNullOrEmpty(Context.Request.Query["category"]) ||
+    !string.IsNullOrEmpty(Context.Request.Query["startDate"]) ||
+    !string.IsNullOrEmpty(Context.Request.Query["endDate"]))
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            Showing filtered results.
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <form asp-action="FarmerProductsEmployee" method="get" class="row g-3 mb-4">
+        <div class="col-md-3">
+            <label for="category" class="form-label">Filter by Category</label>
+            <select class="form-select" id="category" name="category" asp-items="@ViewData["CategorySelectList"] as SelectList">
+                <option value="">-- All Categories --</option>
+            </select>
+        </div>
+
+        <div class="col-md-3">
+            <label for="startDate" class="form-label">Start Production Date</label>
+            <input type="date" id="startDate" name="startDate" class="form-control" value="@(Context.Request.Query["startDate"])" />
+        </div>
+
+        <div class="col-md-3">
+            <label for="endDate" class="form-label">End Production Date</label>
+            <input type="date" id="endDate" name="endDate" class="form-control" value="@(Context.Request.Query["endDate"])" />
+        </div>
+
+        <div class="col-md-3">
+            <label for="sortBy" class="form-label">Sort By</label>
+            <select class="form-select" id="sortBy" name="sortBy">
+                <option value="name_asc" selected="@(Context.Request.Query["sortBy"] == "name_asc" ? "selected" : null)">Name A-Z</option>
+                <option value="name_desc" selected="@(Context.Request.Query["sortBy"] == "name_desc" ? "selected" : null)">Name Z-A</option>
+                <option value="date_asc" selected="@(Context.Request.Query["sortBy"] == "date_asc" ? "selected" : null)">Production Date ↑</option>
+                <option value="date_desc" selected="@(Context.Request.Query["sortBy"] == "date_desc" ? "selected" : null)">Production Date ↓</option>
+            </select>
+        </div>
+
+        <div class="col-12">
+            <button type="submit" class="btn btn-primary">Apply Filters</button>
+            <a asp-action="FarmerProductsEmployee" class="btn btn-secondary">Reset</a>
+        </div>
+    </form>
+
     @* No Products Available Message *@
     @if (!Model.Any())
     {
