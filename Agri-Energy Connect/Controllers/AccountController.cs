@@ -125,6 +125,23 @@ namespace Agri_Energy_Connect.Controllers
                 // Log successful login
                 _logger.LogInformation($"User {model.Email} logged in successfully.");
 
+                // redirect user according to their role
+                var roleClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
+
+                if (roleClaim != null)
+                {
+                    var role = roleClaim.Value;
+                    
+                    if (role == "Farmer")
+                    {
+                        return RedirectToAction("FarmerIndex", "Home");
+                    }
+                    else if (role == "Employee")
+                    {
+                        return RedirectToAction("EmployeeIndex", "Home");
+                    }
+                }
+
                 return RedirectToAction("Index", "Home");
 
             }

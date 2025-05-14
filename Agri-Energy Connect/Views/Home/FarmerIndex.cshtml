@@ -1,0 +1,54 @@
+﻿@{
+    ViewData["Title"] = "Farmer Dashboard";
+}
+
+<div class="container mt-5">
+    <h2 class="mb-4 text-success">
+        <i class="bi bi-tree-fill"></i> Welcome to Agri Energy Connect, Farmer!
+    </h2>
+
+    <p class="lead text-muted">Manage your sustainable agricultural products and connect with green energy solutions.</p>
+
+    <div class="row g-4 mt-4">
+        <!-- Add New Product -->
+        <div class="col-md-6">
+            <div class="card border-success shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-success"><i class="bi bi-plus-circle me-2"></i>Add New Product</h5>
+                    <p class="card-text">Easily list your agricultural products and connect with green energy providers.</p>
+                    <a asp-controller="Products" asp-action="Create" class="btn btn-success">
+                        <i class="bi bi-plus-circle"></i> Add Product
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- My Product Listings -->
+        <div class="col-md-6">
+            <div class="card border-primary shadow h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="bi bi-list-ul me-2"></i>My Product Listings</h5>
+                    <p class="card-text">View, update or delete your current products and track their performance.</p>
+                    <a asp-controller="Products" asp-action="FarmerProductsIndex" class="btn btn-primary">
+                        <i class="bi bi-eye"></i> View Listings
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Advanced Filtering - Full Width -->
+    <div class="row g-4 mt-3">
+        <div class="col-12">
+            <div class="card border-warning shadow">
+                <div class="card-body">
+                    <h5 class="card-title text-warning"><i class="bi bi-funnel-fill me-2"></i>Advanced Filtering</h5>
+                    <p class="card-text">Filter your products by category, production date, or sort them alphabetically and by date range to quickly find what you need.</p>
+                    <a asp-controller="Products" asp-action="FarmerProductsIndex" class="btn btn-warning text-white">
+                        <i class="bi bi-funnel"></i> Explore Filters
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

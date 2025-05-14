@@ -1,4 +1,5 @@
 using DataContextAndModels.Models;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Diagnostics;
 
@@ -14,6 +15,18 @@ namespace Agri_Energy_Connect.Controllers
         }
 
         public IActionResult Index()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Employee")]
+        public IActionResult EmployeeIndex()
+        {
+            return View();
+        }
+
+        [Authorize(Roles = "Farmer")]
+        public IActionResult FarmerIndex()
         {
             return View();
         }
