@@ -16,17 +16,17 @@
 
                 @if (!User.Identity!.IsAuthenticated)
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">Agri Energy Connect</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index"><i class="bi bi-globe2 me-2"></i>Agri Energy Connect</a>
                 }
 
                 @if (User.IsInRole("Farmer"))
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="FarmerIndex">Agri Energy Connect</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="FarmerIndex"><i class="bi bi-globe2 me-2"></i>Agri Energy Connect</a>
                 }
 
                 @if (User.IsInRole("Employee"))
                 {
-                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="EmployeeIndex">Agri Energy Connect</a>
+                    <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="EmployeeIndex"><i class="bi bi-globe2 me-2"></i>Agri Energy Connect</a>
                 }
 
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
