@@ -69,6 +69,9 @@ namespace Agri_Energy_Connect.Controllers
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
+                    // sort by number of products in descending order
+                    categories = categories.OrderByDescending(c => c.NumberOfProducts).ToList();
+
                     // Return the list of categories to the view
                     return View(categories);
 

@@ -47,7 +47,7 @@
                             <h5 class="mb-0">@category.Name</h5>
                         </div>
                         <div class="card-body">
-                            <p class="text-muted mb-0">Manage products under this category.</p>
+                            <p class="text-muted mb-0">Manage @category.NumberOfProducts products under this category.</p>
                         </div>
                         <div class="card-footer bg-light d-flex justify-content-between gap-2">
                             <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm">

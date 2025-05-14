@@ -52,6 +52,16 @@ namespace Agri_Energy_Connect_API.Controllers
                     Name = c.Name
                 }).ToList();
 
+                // count the number of products in each category
+                foreach (var categoryDto in categoryDtos)
+                {
+                    var category = categories.FirstOrDefault(c => c.Id == categoryDto.Id);
+                    if (category != null)
+                    {
+                        categoryDto.NumberOfProducts = category.Products.Count;
+                    }
+                }
+
                 // Return the list of categories
                 return Ok(categoryDtos);
             }
