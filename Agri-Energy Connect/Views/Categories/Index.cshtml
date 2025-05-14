@@ -4,64 +4,82 @@
     ViewData["Title"] = "Product Categories";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0">
+                <div class="card-body">
+                    <h2 class="card-title mb-4 text-center">
+                        <i class="bi bi-tags-fill text-primary me-2"></i> @ViewData["Title"]
+                    </h2>
 
-    <h2 class="mb-4">Manage Product Categories</h2>
-
-    @* Success Message *@
-    @if (ViewData["SuccessMessage"] != null)
-    {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @ViewData["SuccessMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    @* Error Message *@
-    @if (ViewData["ErrorMessage"] != null)
-    {
-        <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @ViewData["ErrorMessage"]
-            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-        </div>
-    }
-
-    <div class="mb-4 d-flex justify-content-start">
-        <a asp-controller="Categories" asp-action="Create" class="btn btn-primary">
-            <i class="bi bi-plus-circle"></i> Create Category
-        </a>
-    </div>
-
-    @if (!Model.Any())
-    {
-        <div class="alert alert-info">No categories available.</div>
-    }
-    else
-    {
-        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-            @foreach (var category in Model)
-            {
-                <div class="col">
-                    <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white">
-                            <h5 class="mb-0">@category.Name</h5>
+                    @* Success Message *@
+                    @if (ViewData["SuccessMessage"] != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            <i class="bi bi-check-circle-fill me-2"></i>
+                            @ViewData["SuccessMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <div class="card-body">
-                            <p class="text-muted mb-0">Manage @category.NumberOfProducts products under this category.</p>
+                    }
+
+                    @* Error Message *@
+                    @if (ViewData["ErrorMessage"] != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            @ViewData["ErrorMessage"]
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                         </div>
-                        <div class="card-footer bg-light d-flex justify-content-between gap-2">
-                            <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm">
-                                <i class="bi bi-trash"></i> Delete
-                            </a>
-                            <a asp-controller="Products" asp-action="CategoryProductsEmployee" asp-route-id="@category.Id" class="btn btn-info btn-sm">
-                                <i class="bi bi-boxes"></i> View Products
-                            </a>
-                        </div>
+                    }
+
+                    <div class="d-flex justify-content-start mb-4">
+                        <a asp-controller="Categories" asp-action="Create" class="btn btn-outline-primary">
+                            <i class="bi bi-plus-circle me-1"></i> Create Category
+                        </a>
                     </div>
+
+                    @if (!Model.Any())
+                    {
+                        <div class="alert alert-info text-center">
+                            <i class="bi bi-info-circle-fill me-2"></i> No categories available.
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+                            @foreach (var category in Model)
+                            {
+                                <div class="col">
+                                    <div class="card h-100 shadow-sm border-0">
+                                        <div class="card-header bg-primary text-white">
+                                            <h5 class="mb-0">
+                                                <i class="bi bi-folder-fill me-1"></i> @category.Name
+                                            </h5>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="text-muted mb-0">
+                                                <i class="bi bi-box-seam me-1"></i>
+                                                Manage <strong>@category.NumberOfProducts</strong> product(s) under this category.
+                                            </p>
+                                        </div>
+                                        <div class="card-footer bg-light d-flex justify-content-between">
+                                            <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-outline-danger btn-sm">
+                                                <i class="bi bi-trash-fill"></i> Delete
+                                            </a>
+                                            <a asp-controller="Products" asp-action="CategoryProductsEmployee" asp-route-id="@category.Id" class="btn btn-outline-info btn-sm">
+                                                <i class="bi bi-boxes"></i> View Products
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
                 </div>
-            }
+            </div>
         </div>
-    }
+    </div>
 </div>
 
 @section Scripts {
