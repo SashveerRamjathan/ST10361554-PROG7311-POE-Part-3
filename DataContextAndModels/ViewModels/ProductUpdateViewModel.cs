@@ -9,6 +9,10 @@ namespace DataContextAndModels.ViewModels
 {
     public class ProductUpdateViewModel
     {
+
+        [Required(ErrorMessage = "Product Id is required")]
+        public string Id { get; set; }
+
         [Required(ErrorMessage = "Product Name is required")]
         [StringLength(100, ErrorMessage = "Product Name cannot be longer than 100 characters")]
         public string Name { get; set; }
@@ -28,5 +32,8 @@ namespace DataContextAndModels.ViewModels
         [Required(ErrorMessage = "Production Date is required")]
         [DataType(DataType.Date)]
         public DateTime ProductionDate { get; set; }
+
+        [Required(ErrorMessage = "CategoryId is required")]
+        public string CategoryId { get; set; }
     }
 }

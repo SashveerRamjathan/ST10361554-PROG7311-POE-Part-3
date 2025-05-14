@@ -1,0 +1,81 @@
+﻿@model List<DataContextAndModels.DataTransferObjects.ProductDto>
+
+@{
+    ViewData["Title"] = "Farmer's Product Management";
+}
+
+<div class="container mt-4">
+
+    <h2 class="mb-4">My Products</h2>
+
+    @* Success Message *@
+    @if (ViewData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            @ViewData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @* Error Message *@
+    @if (ViewData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @ViewData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <a asp-controller="Products" asp-action="Create" class="btn btn-primary mb-3">
+        <i class="bi bi-plus-circle"></i> Create Product
+    </a>
+
+    @* No Products Available Message *@
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">No products available.</div>
+    }
+    else
+    {
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+            @foreach (var product in Model)
+            {
+                <div class="col">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">@product.Name</h5>
+                        </div>
+                        <div class="card-body">
+                            <p class="mb-2"><strong>Description:</strong> @product.Description</p>
+                            <p class="mb-2"><strong>Price:</strong> R @product.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))</p>
+                            <p class="mb-2"><strong>Quantity:</strong> @product.Quantity</p>
+                            <p class="mb-2"><strong>Production Date:</strong> @product.ProductionDate.ToString("dd-MMMM-yyyy")</p>
+                            <p class="mb-2"><strong>Category:</strong> @product.CategoryName</p>
+                        </div>
+                        <div class="card-footer bg-light d-flex justify-content-between gap-2">
+                            <a asp-controller="Products" asp-action="Details" asp-route-id="@product.Id" class="btn btn-info btn-sm">
+                                <i class="bi bi-eye"></i> Details
+                            </a>
+
+                            @if (User.IsInRole("Farmer"))
+                            {
+                                <a asp-controller="Products" asp-action="Edit" asp-route-id="@product.Id" class="btn btn-warning btn-sm">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-controller="Products" asp-action="Delete" asp-route-id="@product.Id" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Delete
+                                </a>
+                            }
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+
+</div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+}

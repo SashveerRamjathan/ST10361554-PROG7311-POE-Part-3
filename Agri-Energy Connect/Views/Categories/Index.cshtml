@@ -1,4 +1,4 @@
-﻿@model List<DataContextAndModels.Models.Category>
+﻿@model List<DataContextAndModels.DataTransferObjects.CategoryDto>
 
 @{
     ViewData["Title"] = "Product Categories";
@@ -53,7 +53,7 @@
                             <a asp-controller="Categories" asp-action="Delete" asp-route-id="@category.Id" class="btn btn-danger btn-sm">
                                 <i class="bi bi-trash"></i> Delete
                             </a>
-                            <a asp-controller="Product" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-info btn-sm">
+                            <a asp-controller="Products" asp-action="ByCategory" asp-route-categoryId="@category.Id" class="btn btn-info btn-sm">
                                 <i class="bi bi-boxes"></i> View Products
                             </a>
                         </div>

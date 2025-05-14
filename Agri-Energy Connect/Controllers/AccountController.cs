@@ -196,7 +196,7 @@ namespace Agri_Energy_Connect.Controllers
                 {
                     _logger.LogInformation($"Farmer registered successfully via API for email: {model.EmailAddress}");
                     TempData["SuccessMessage"] = "Farmer registered successfully.";
-                    return RedirectToAction("Index", "Home");
+                    return RedirectToAction("Index", "FarmerManagement");
                 }
 
                 var responseContent = await response.Content.ReadAsStringAsync();

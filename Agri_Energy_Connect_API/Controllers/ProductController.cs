@@ -1,4 +1,5 @@
 ﻿using DataContextAndModels.Data;
+using DataContextAndModels.DataTransferObjects;
 using DataContextAndModels.Models;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -23,7 +24,6 @@ namespace Agri_Energy_Connect_API.Controllers
 
         // GET: api/products/all
         [HttpGet("all")]
-        [Authorize]
         public async Task<IActionResult> GetAllProducts()
         {
             try
@@ -47,8 +47,33 @@ namespace Agri_Energy_Connect_API.Controllers
                 // log the number of products found
                 _logger.LogInformation($"Found {products.Count} products.");
 
+                // check navigation properties is not null, if null, return 404
+                foreach (var product in products)
+                {
+                    if (product.Category == null || product.Farmer == null)
+                    {
+                        _logger.LogWarning($"Product with ID {product.Id} has null navigation properties.");
+                        return NotFound($"Product with ID {product.Id} has null navigation properties.");
+                    }
+                }
+
+                // convert the products to a list of ProductDtos
+                var productDtos = products.Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    Quantity = p.Quantity,
+                    ProductionDate = p.ProductionDate,
+                    FarmerId = p.FarmerId,
+                    CategoryId = p.CategoryId,
+                    FarmerName = p.Farmer.FullName!, 
+                    CategoryName = p.Category.Name 
+                }).ToList();
+
                 // Return the list of products
-                return Ok(products);
+                return Ok(productDtos);
             }
             catch (Exception ex)
             {
@@ -61,7 +86,6 @@ namespace Agri_Energy_Connect_API.Controllers
 
         // GET: api/products/{id}
         [HttpGet("{id}")]
-        [Authorize]
         public async Task<IActionResult> GetProductById(string id)
         {
             try
@@ -92,8 +116,30 @@ namespace Agri_Energy_Connect_API.Controllers
                 // log the product details
                 _logger.LogInformation($"Found product: {product.Name}");
 
+                // Check if the navigation properties are null
+                if (product.Category == null || product.Farmer == null)
+                {
+                    _logger.LogWarning($"Product with ID {id} has null navigation properties.");
+                    return NotFound($"Product with ID {id} has null navigation properties.");
+                }
+
+                // convert the product to a ProductDto
+                var productDto = new ProductDto
+                {
+                    Id = product.Id,
+                    Name = product.Name,
+                    Description = product.Description,
+                    Price = product.Price,
+                    Quantity = product.Quantity,
+                    ProductionDate = product.ProductionDate,
+                    FarmerId = product.FarmerId,
+                    CategoryId = product.CategoryId,
+                    FarmerName = product.Farmer.FullName!,
+                    CategoryName = product.Category.Name!
+                };
+
                 // Return the product
-                return Ok(product);
+                return Ok(productDto);
             }
             catch (Exception ex)
             {
@@ -104,9 +150,9 @@ namespace Agri_Energy_Connect_API.Controllers
             }
         }
 
-        // POST: api/products
+        // POST: api/Product
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> CreateProduct([FromBody] ProductCreateViewModel product)
         {
             try
@@ -170,11 +216,11 @@ namespace Agri_Energy_Connect_API.Controllers
 
                 // Save changes to the database
                 await _context.SaveChangesAsync();
-                // log the product creation
 
+                // log the product creation
                 _logger.LogInformation($"Product created with ID: {newProduct.Id}");
 
-                return Ok();
+                return Ok(new { id = newProduct.Id}); 
             }
             catch (Exception ex)
             {
@@ -233,14 +279,51 @@ namespace Agri_Energy_Connect_API.Controllers
                 existingProduct.Price = product.Price;
                 existingProduct.Quantity = product.Quantity;
                 existingProduct.ProductionDate = product.ProductionDate;
+                existingProduct.CategoryId = product.CategoryId;
 
                 // Save changes to the database
                 await _context.SaveChangesAsync();
 
+                // get the updated product from the database
+                existingProduct = await _context.Products
+                    .Include(p => p.Category) // Include the Category navigation property
+                    .Include(p => p.Farmer) // Include the Farmer navigation property
+                    .FirstOrDefaultAsync(p => p.Id == id);
+
+                // Check if the updated product is null
+                if (existingProduct == null)
+                {
+                    _logger.LogWarning($"Updated product with ID {id} not found.");
+                    return NotFound($"Updated product with ID {id} not found.");
+                }
+
+                // Check if the navigation properties are null
+                if (existingProduct.Category == null || existingProduct.Farmer == null)
+                {
+                    _logger.LogWarning($"Updated product with ID {id} has null navigation properties.");
+                    return NotFound($"Updated product with ID {id} has null navigation properties.");
+                }
+
+                // convert the updated product to a ProductDto
+                var productDto = new ProductDto
+                {
+                    Id = existingProduct.Id,
+                    Name = existingProduct.Name,
+                    Description = existingProduct.Description,
+                    Price = existingProduct.Price,
+                    Quantity = existingProduct.Quantity,
+                    ProductionDate = existingProduct.ProductionDate,
+                    FarmerId = existingProduct.FarmerId,
+                    CategoryId = existingProduct.CategoryId,
+                    FarmerName = existingProduct.Farmer.FullName!,
+                    CategoryName = existingProduct.Category.Name!
+                };
+
                 // log the product update
                 _logger.LogInformation($"Product updated with ID: {existingProduct.Id}");
 
-                return Ok();
+                // Return the updated product
+                return Ok(productDto);
             }
             catch (Exception ex)
             {
@@ -330,11 +413,36 @@ namespace Agri_Energy_Connect_API.Controllers
                     return NotFound($"No products found for category ID {categoryId}.");
                 }
 
+                // Check if the navigation properties are null
+                foreach (var product in products)
+                {
+                    if (product.Category == null || product.Farmer == null)
+                    {
+                        _logger.LogWarning($"Product with ID {product.Id} has null navigation properties.");
+                        return NotFound($"Product with ID {product.Id} has null navigation properties.");
+                    }
+                }
+
+                // convert the products to a list of ProductDtos
+                var productDtos = products.Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    Quantity = p.Quantity,
+                    ProductionDate = p.ProductionDate,
+                    FarmerId = p.FarmerId,
+                    CategoryId = p.CategoryId,
+                    FarmerName = p.Farmer.FullName!,
+                    CategoryName = p.Category.Name!
+                }).ToList();
+
                 // log the number of products found
                 _logger.LogInformation($"Found {products.Count} products for category ID {categoryId}.");
 
                 // Return the list of products
-                return Ok(products);
+                return Ok(productDtos);
             }
             catch (Exception ex)
             {
@@ -376,11 +484,36 @@ namespace Agri_Energy_Connect_API.Controllers
                     return NotFound($"No products found for farmer ID {farmerId}.");
                 }
 
+                // Check if the navigation properties are null
+                foreach (var product in products)
+                {
+                    if (product.Category == null || product.Farmer == null)
+                    {
+                        _logger.LogWarning($"Product with ID {product.Id} has null navigation properties.");
+                        return NotFound($"Product with ID {product.Id} has null navigation properties.");
+                    }
+                }
+
+                // convert the products to a list of ProductDtos
+                var productDtos = products.Select(p => new ProductDto
+                {
+                    Id = p.Id,
+                    Name = p.Name,
+                    Description = p.Description,
+                    Price = p.Price,
+                    Quantity = p.Quantity,
+                    ProductionDate = p.ProductionDate,
+                    FarmerId = p.FarmerId,
+                    CategoryId = p.CategoryId,
+                    FarmerName = p.Farmer.FullName!,
+                    CategoryName = p.Category.Name!
+                }).ToList();
+
                 // log the number of products found
                 _logger.LogInformation($"Found {products.Count} products for farmer ID {farmerId}.");
 
                 // Return the list of products
-                return Ok(products);
+                return Ok(productDtos);
 
             }
             catch (Exception ex)

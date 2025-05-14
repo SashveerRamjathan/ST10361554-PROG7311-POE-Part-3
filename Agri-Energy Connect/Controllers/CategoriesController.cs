@@ -1,4 +1,5 @@
 ﻿using Agri_Energy_Connect.Services;
+using DataContextAndModels.DataTransferObjects;
 using DataContextAndModels.Models;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -43,17 +44,15 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _logger.LogWarning("No categories found.");
-                    TempData["ErrorMessage"] = "No categories found.";
-                    ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                    return View(new List<Category>());
+                    return View(new List<CategoryDto>());
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
 
-                    var categories = JsonConvert.DeserializeObject<List<Category>>(jsonResponse);
+                    var categories = JsonConvert.DeserializeObject<List<CategoryDto>>(jsonResponse);
 
                     if (categories == null || categories.Count == 0)
                     {
@@ -62,7 +61,7 @@ namespace Agri_Energy_Connect.Controllers
 
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                        return View(new List<Category>());
+                        return View(new List<CategoryDto>());
                     }
 
                     // Log the number of categories found
@@ -84,7 +83,7 @@ namespace Agri_Energy_Connect.Controllers
 
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                return View(new List<Category>());
+                return View(new List<CategoryDto>());
             }
             catch (Exception ex)
             {
@@ -94,7 +93,7 @@ namespace Agri_Energy_Connect.Controllers
 
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                return View(new List<Category>());
+                return View(new List<CategoryDto>());
             }
         }
 
@@ -162,7 +161,7 @@ namespace Agri_Energy_Connect.Controllers
 
                     // Deserialize the response to get the created category
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-                    var createdCategory = JsonConvert.DeserializeObject<Category>(jsonResponse);
+                    var createdCategory = JsonConvert.DeserializeObject<CategoryDto>(jsonResponse);
 
                     if (createdCategory == null)
                     {
@@ -239,7 +238,7 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-                    var category = JsonConvert.DeserializeObject<Category>(jsonResponse);
+                    var category = JsonConvert.DeserializeObject<CategoryDto>(jsonResponse);
 
                     if (category == null)
                     {

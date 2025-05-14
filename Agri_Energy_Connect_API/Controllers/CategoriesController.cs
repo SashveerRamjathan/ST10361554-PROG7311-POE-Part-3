@@ -1,5 +1,6 @@
 ﻿using DataContextAndModels.Data;
 using DataContextAndModels.Models;
+using DataContextAndModels.DataTransferObjects;
 using DataContextAndModels.ViewModels;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
@@ -46,8 +47,15 @@ namespace Agri_Energy_Connect_API.Controllers
                 // log the number of categories found
                 _logger.LogInformation($"Found {categories.Count} categories.");
 
+                // convert the categories to a list of CategoryDtos
+                var categoryDtos = categories.Select(c => new CategoryDto
+                {
+                    Id = c.Id,
+                    Name = c.Name
+                }).ToList();
+
                 // Return the list of categories
-                return Ok(categories);
+                return Ok(categoryDtos);
             }
             catch (Exception ex)
             {
@@ -93,8 +101,15 @@ namespace Agri_Energy_Connect_API.Controllers
                 // log the category details
                 _logger.LogInformation($"Found category: {category.Name}");
 
+                // convert the category to a CategoryDto
+                var categoryDto = new CategoryDto
+                {
+                    Id = category.Id,
+                    Name = category.Name
+                };
+
                 // Return the category
-                return Ok(category);
+                return Ok(categoryDto);
             }
             catch (Exception ex)
             {
@@ -150,8 +165,15 @@ namespace Agri_Energy_Connect_API.Controllers
                 // log the category creation
                 _logger.LogInformation($"Category created with ID: {newCategory.Id}");
 
+                // convert the new category to a CategoryDto
+                var categoryDto = new CategoryDto
+                {
+                    Id = newCategory.Id,
+                    Name = newCategory.Name
+                };
+
                 // return ok response
-                return Ok(newCategory);
+                return Ok(categoryDto);
             }
             catch (Exception ex)
             {
