@@ -10,13 +10,13 @@
     <!-- Hero Section -->
     <div class="text-center mb-5">
         <h1 class="display-4 fw-bold text-success">
-            Empowering Sustainable Agriculture with Green Energy
+            <i class="bi bi-globe2 me-2"></i> Empowering Sustainable Agriculture with Green Energy
         </h1>
         <p class="lead text-muted">
             Agri-Energy Connect bridges the gap between farmers, renewable energy partners, and sustainable buyers across South Africa.
         </p>
         <div class="mt-4">
-            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-success btn-lg me-2">
+            <a asp-controller="Account" asp-action="Login" class="btn btn-outline-success btn-lg me-2 shadow-sm">
                 <i class="bi bi-box-arrow-in-right me-1"></i> Sign In
             </a>
         </div>
@@ -25,17 +25,19 @@
     <!-- Purpose Section -->
     <div class="row mb-5">
         <div class="col-lg-8 mx-auto text-center">
-            <h2 class="text-primary fw-semibold">Our Purpose</h2>
-            <p class="text-muted fs-5">
-                We connect local farmers to clean energy programs and sustainable markets supporting economic empowerment and ecological resilience.
-            </p>
+            <div class="card border-0 shadow-sm p-4">
+                <h2 class="text-primary fw-semibold"><i class="bi bi-bullseye me-2"></i> Our Purpose</h2>
+                <p class="text-muted fs-5 mt-3">
+                    We connect local farmers to clean energy programs and sustainable markets supporting economic empowerment and ecological resilience.
+                </p>
+            </div>
         </div>
     </div>
 
     <!-- Features Section -->
     <div class="row text-center g-4">
         <div class="col-md-4">
-            <div class="card shadow-sm h-100 border-0">
+            <div class="card shadow h-100 border-success border-2">
                 <div class="card-body">
                     <i class="bi bi-tree-fill display-4 text-success mb-3"></i>
                     <h5 class="card-title">Farmer Management</h5>
@@ -44,7 +46,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow-sm h-100 border-0">
+            <div class="card shadow h-100 border-primary border-2">
                 <div class="card-body">
                     <i class="bi bi-box-seam display-4 text-primary mb-3"></i>
                     <h5 class="card-title">Product Listings</h5>
@@ -53,7 +55,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <div class="card shadow-sm h-100 border-0">
+            <div class="card shadow h-100 border-warning border-2">
                 <div class="card-body">
                     <i class="bi bi-tags-fill display-4 text-warning mb-3"></i>
                     <h5 class="card-title">Smart Categorization</h5>
@@ -63,28 +65,34 @@
         </div>
     </div>
 
-    <!-- How It Works -->
+    <!-- How It Works Section -->
     <div class="row text-center mt-5">
-        <h2 class="fw-semibold mb-4">How It Works</h2>
+        <h2 class="fw-semibold mb-4 text-dark"><i class="bi bi-diagram-3-fill me-2"></i> How It Works</h2>
         <div class="col-md-4">
-            <div class="p-4">
-                <i class="bi bi-person-lines-fill display-4 text-info mb-3"></i>
-                <h5>1. Farmers Join via Employee</h5>
-                <p>Farmers are onboarded by a verified Agri-Energy Connect employee for security and support.</p>
+            <div class="card border-info border-2 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-person-lines-fill display-4 text-info mb-3"></i>
+                    <h5>1. Farmers Join via Employee</h5>
+                    <p>Farmers are onboarded by a verified Agri-Energy Connect employee for security and support.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="p-4">
-                <i class="bi bi-upload display-4 text-success mb-3"></i>
-                <h5>2. List Products</h5>
-                <p>Approved users can list products and describe environmental benefits.</p>
+            <div class="card border-success border-2 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-upload display-4 text-success mb-3"></i>
+                    <h5>2. List Products</h5>
+                    <p>Approved users can list products and describe environmental benefits.</p>
+                </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="p-4">
-                <i class="bi bi-lightbulb-fill display-4 text-warning mb-3"></i>
-                <h5>3. Connect & Collaborate</h5>
-                <p>Buyers and energy partners connect with farmers to drive impact and growth.</p>
+            <div class="card border-warning border-2 shadow-sm h-100">
+                <div class="card-body">
+                    <i class="bi bi-lightbulb-fill display-4 text-warning mb-3"></i>
+                    <h5>3. Connect & Collaborate</h5>
+                    <p>Buyers and energy partners connect with farmers to drive impact and growth.</p>
+                </div>
             </div>
         </div>
     </div>
@@ -92,13 +100,18 @@
     <!-- Farmer Registration Info -->
     <div class="row justify-content-center mt-5">
         <div class="col-md-8">
-            <div class="bg-light p-4 rounded shadow-sm text-center">
-                <h4 class="fw-bold text-success">Are You a Farmer?</h4>
+            <div class="card bg-light p-4 rounded shadow-sm text-center">
+                <h4 class="fw-bold text-success"><i class="bi bi-person-plus-fill me-2"></i> Are You a Farmer?</h4>
                 <p class="mb-3 text-muted">To join the platform, please reach out to our registration officer:</p>
                 <div class="d-flex justify-content-center align-items-center flex-column">
-                    <p class="mb-1"><strong>@fullName</strong></p>
-                    <p class="mb-1"><i class="bi bi-envelope-fill text-primary"></i> <a href="mailto:@defaultEmail">@defaultEmail</a></p>
-                    <p class="mb-0"><i class="bi bi-telephone-fill text-success"></i> @phoneNumber</p>
+                    <p class="mb-1 fw-semibold fs-5">@fullName</p>
+                    <p class="mb-1">
+                        <i class="bi bi-envelope-fill text-primary"></i>
+                        <a href="mailto:@defaultEmail">@defaultEmail</a>
+                    </p>
+                    <p class="mb-0">
+                        <i class="bi bi-telephone-fill text-success"></i> @phoneNumber
+                    </p>
                 </div>
             </div>
         </div>

@@ -9,26 +9,33 @@
 
     <p class="lead text-muted">Manage farmers, products, and categories to support sustainable agriculture and green energy integration.</p>
 
-    <!-- Farmer Management Section -->
-    <div class="row g-4 mt-4">
-        <div class="col-md-6">
-            <div class="card border-success shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-success"><i class="bi bi-person-plus-fill me-2"></i>Register New Farmer</h5>
-                    <p class="card-text">Add new farmer profiles to the platform for product contributions and profile management.</p>
-                    <a asp-controller="Account" asp-action="RegisterFarmer" class="btn btn-success">
+    <!-- Register New Farmer -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-success shadow-sm">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <div>
+                        <h5 class="card-title text-success"><i class="bi bi-person-plus-fill me-2"></i> Register New Farmer</h5>
+                        <p class="card-text">Add new farmer profiles to the platform for product contributions and profile management.</p>
+                    </div>
+                    <a asp-controller="Account" asp-action="RegisterFarmer" class="btn btn-success mt-3 mt-md-0">
                         <i class="bi bi-person-plus"></i> Register Farmer
                     </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6">
-            <div class="card border-info shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-info"><i class="bi bi-people-fill me-2"></i>Manage Farmers</h5>
-                    <p class="card-text">View, update, or delete existing farmer profiles from the platform database.</p>
-                    <a asp-controller="FarmerManagement" asp-action="Index" class="btn btn-info text-white">
+    <!-- Manage Farmers -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-info shadow-sm">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <div>
+                        <h5 class="card-title text-info"><i class="bi bi-people-fill me-2"></i> Manage Farmers</h5>
+                        <p class="card-text">View, update, or delete existing farmer profiles from the platform database.</p>
+                    </div>
+                    <a asp-controller="FarmerManagement" asp-action="Index" class="btn btn-info text-white mt-3 mt-md-0">
                         <i class="bi bi-person-lines-fill"></i> Manage Farmers
                     </a>
                 </div>
@@ -36,14 +43,16 @@
         </div>
     </div>
 
-    <!-- Product Management Section -->
-    <div class="row g-4 mt-2">
-        <div class="col-md-0">
-            <div class="card border-primary shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-primary"><i class="bi bi-box-seam me-2"></i>All Products</h5>
-                    <p class="card-text">View all products listed across the platform. Use filters by farmer, category, and date.</p>
-                    <a asp-controller="Products" asp-action="Index" class="btn btn-primary">
+    <!-- View All Products -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-primary shadow-sm">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <div>
+                        <h5 class="card-title text-primary"><i class="bi bi-box-seam me-2"></i> All Products</h5>
+                        <p class="card-text">View all products listed across the platform. Use filters by farmer, category, and date.</p>
+                    </div>
+                    <a asp-controller="Products" asp-action="Index" class="btn btn-primary mt-3 mt-md-0">
                         <i class="bi bi-box"></i> View Products
                     </a>
                 </div>
@@ -51,26 +60,33 @@
         </div>
     </div>
 
-    <!-- Product Category Section -->
-    <div class="row g-4 mt-2">
-        <div class="col-md-6">
-            <div class="card border-secondary shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-secondary"><i class="bi bi-tags-fill me-2"></i>Manage Categories</h5>
-                    <p class="card-text">View or delete existing product categories used by farmers.</p>
-                    <a asp-controller="Categories" asp-action="Index" class="btn btn-secondary">
+    <!-- Manage Categories -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card border-secondary shadow-sm">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <div>
+                        <h5 class="card-title text-secondary"><i class="bi bi-tags-fill me-2"></i> Manage Categories</h5>
+                        <p class="card-text">View or delete existing product categories used by farmers.</p>
+                    </div>
+                    <a asp-controller="Categories" asp-action="Index" class="btn btn-secondary mt-3 mt-md-0">
                         <i class="bi bi-list-check"></i> Manage Categories
                     </a>
                 </div>
             </div>
         </div>
+    </div>
 
-        <div class="col-md-6">
-            <div class="card border-dark shadow h-100">
-                <div class="card-body">
-                    <h5 class="card-title text-dark"><i class="bi bi-plus-square-fill me-2"></i>Create Category</h5>
-                    <p class="card-text">Add new product categories for farmers to classify their offerings.</p>
-                    <a asp-controller="Categories" asp-action="Create" class="btn btn-dark">
+    <!-- Create New Category -->
+    <div class="row mb-5">
+        <div class="col-12">
+            <div class="card border-dark shadow-sm">
+                <div class="card-body d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+                    <div>
+                        <h5 class="card-title text-dark"><i class="bi bi-plus-square-fill me-2"></i> Create Category</h5>
+                        <p class="card-text">Add new product categories for farmers to classify their offerings.</p>
+                    </div>
+                    <a asp-controller="Categories" asp-action="Create" class="btn btn-dark mt-3 mt-md-0">
                         <i class="bi bi-plus"></i> Create Category
                     </a>
                 </div>
