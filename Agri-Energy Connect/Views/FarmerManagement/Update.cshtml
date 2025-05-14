@@ -5,9 +5,10 @@
 }
 
 <div class="container mt-5">
+    <!-- Card for the Form -->
     <div class="card shadow-lg border-0 rounded-4">
         <div class="card-header bg-primary text-white rounded-top-4">
-            <h4 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i>Update Farmer Details</h4>
+            <h4 class="mb-0"><i class="bi bi-person-lines-fill me-2"></i> Update Farmer Details</h4>
         </div>
 
         <form id="updateForm" asp-action="Update" asp-controller="FarmerManagement" method="post">
@@ -15,50 +16,56 @@
 
                 <input type="hidden" asp-for="Id" />
 
+                <!-- Full Name Field -->
                 <div class="mb-3">
-                    <label asp-for="FullName" class="form-label fw-semibold"></label>
-                    <input asp-for="FullName" class="form-control rounded-3" />
+                    <label asp-for="FullName" class="form-label fw-semibold">Full Name</label>
+                    <input asp-for="FullName" class="form-control rounded-3" placeholder="Enter full name" />
                     <span asp-validation-for="FullName" class="text-danger small"></span>
                 </div>
 
+                <!-- Email Address Field -->
                 <div class="mb-3">
-                    <label asp-for="EmailAddress" class="form-label fw-semibold"></label>
-                    <input asp-for="EmailAddress" class="form-control rounded-3" />
+                    <label asp-for="EmailAddress" class="form-label fw-semibold">Email Address</label>
+                    <input asp-for="EmailAddress" class="form-control rounded-3" placeholder="Enter email address" />
                     <span asp-validation-for="EmailAddress" class="text-danger small"></span>
                 </div>
 
+                <!-- Phone Number Field -->
                 <div class="mb-3">
-                    <label asp-for="PhoneNumber" class="form-label fw-semibold"></label>
-                    <input asp-for="PhoneNumber" class="form-control rounded-3" />
+                    <label asp-for="PhoneNumber" class="form-label fw-semibold">Phone Number</label>
+                    <input asp-for="PhoneNumber" class="form-control rounded-3" placeholder="Enter phone number" />
                     <span asp-validation-for="PhoneNumber" class="text-danger small"></span>
                 </div>
 
+                <!-- Address Field -->
                 <div class="mb-3">
-                    <label asp-for="Address" class="form-label fw-semibold"></label>
-                    <input asp-for="Address" class="form-control rounded-3" />
+                    <label asp-for="Address" class="form-label fw-semibold">Address</label>
+                    <input asp-for="Address" class="form-control rounded-3" placeholder="Enter address" />
                     <span asp-validation-for="Address" class="text-danger small"></span>
                 </div>
+
             </div>
 
+            <!-- Card Footer with Buttons -->
             <div class="card-footer d-flex justify-content-between px-4 py-3 bg-light border-top rounded-bottom-4">
-                <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
-                    <i class="bi bi-save"></i> Review & Confirm
-                </button>
-                <a asp-action="Index" asp-controller="FarmerManagement" class="btn btn-secondary">
+                <a asp-action="Index" asp-controller="FarmerManagement" class="btn btn-outline-secondary">
                     <i class="bi bi-x-circle"></i> Cancel
                 </a>
+                <button type="button" class="btn btn-warning" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
+                    <i class="bi bi-save"></i> Review & Confirm
+                </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Confirmation Modal -->
 <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
         <div class="modal-content shadow">
             <div class="modal-header bg-warning text-dark">
                 <h5 class="modal-title" id="confirmUpdateModalLabel">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Update
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Update
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -76,7 +83,7 @@
                     Cancel
                 </button>
                 <button type="button" class="btn btn-success" onclick="submitForm()">
-                    <i class="bi bi-check-circle-fill me-1"></i>Confirm Update
+                    <i class="bi bi-check-circle-fill me-1"></i> Confirm Update
                 </button>
             </div>
         </div>
@@ -85,6 +92,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         const form = document.getElementById("updateForm");
 

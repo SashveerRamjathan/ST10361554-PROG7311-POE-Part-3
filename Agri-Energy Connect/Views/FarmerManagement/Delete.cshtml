@@ -24,7 +24,7 @@
         </div>
     }
 
-    <div class="card shadow rounded-3 border-danger">
+    <div class="card shadow-lg rounded-4 border-danger">
         <div class="card-header bg-danger text-white d-flex align-items-center">
             <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
             <h4 class="mb-0">Confirm Deletion</h4>
@@ -49,13 +49,13 @@
                 <input asp-for="Address" class="form-control" readonly />
             </div>
         </div>
-        <div class="card-footer d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-                <i class="bi bi-trash"></i> Delete
-            </button>
+        <div class="card-footer d-flex justify-content-between gap-2">
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back
+                <i class="bi bi-arrow-left me-2"></i> Back
             </a>
+            <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
+                <i class="bi bi-trash me-2"></i> Delete
+            </button>
         </div>
     </div>
 </div>
@@ -74,14 +74,14 @@
                 Are you absolutely sure you want to delete <strong>@Model.FullName</strong>? This action cannot be undone.
             </div>
             <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-2"></i> Cancel
+                </button>
                 <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" class="d-inline">
                     <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-check-circle"></i> Yes, Delete
+                        <i class="bi bi-check-circle me-2"></i> Yes, Delete
                     </button>
                 </form>
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
-                    <i class="bi bi-x-circle"></i> Cancel
-                </button>
             </div>
         </div>
     </div>
@@ -89,6 +89,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         // Optional: Automatically focus modal when shown
         const deleteModal = document.getElementById('confirmDeleteModal');

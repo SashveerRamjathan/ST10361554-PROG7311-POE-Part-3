@@ -24,7 +24,7 @@
         </div>
     }
 
-    <div class="card shadow rounded-3">
+    <div class="card shadow-lg rounded-4">
         <div class="card-header bg-primary text-white d-flex align-items-center">
             <i class="bi bi-person-fill fs-4 me-2"></i>
             <h4 class="mb-0">Farmer Details</h4>
@@ -47,12 +47,12 @@
                 <input asp-for="Address" class="form-control" readonly />
             </div>
         </div>
-        <div class="card-footer d-flex justify-content-end gap-2">
-            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-success">
-                <i class="bi bi-pencil-square"></i> Update Farmer
-            </a>
+        <div class="card-footer d-flex justify-content-between gap-2">
             <a asp-action="Index" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back
+                <i class="bi bi-arrow-left me-2"></i> Back
+            </a>
+            <a asp-action="Update" asp-route-id="@Model.Id" class="btn btn-warning">
+                <i class="bi bi-pencil-square me-2"></i> Update Farmer
             </a>
         </div>
     </div>
