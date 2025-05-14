@@ -8,11 +8,11 @@
     @* Category Name Display (if any product exists) *@
     @if (Model.Any())
     {
-        <h2 class="mb-4">Products in @Model.FirstOrDefault()?.CategoryName</h2>
+        <h2 class="mb-4 text-primary">Products in @Model.FirstOrDefault()?.CategoryName</h2>
     }
     else
     {
-        <h2 class="mb-4">No Products Available</h2>
+        <h2 class="mb-4 text-warning">No Products Available</h2>
     }
 
     @* Success Message *@
@@ -34,43 +34,54 @@
     }
 
     @* Filter Indicator *@
-    @if (!string.IsNullOrEmpty(Context.Request.Query["startDate"]) ||
-    !string.IsNullOrEmpty(Context.Request.Query["endDate"]))
+    @if (!string.IsNullOrEmpty(Context.Request.Query["startDate"]) || !string.IsNullOrEmpty(Context.Request.Query["endDate"]))
     {
-        <div class="alert alert-success alert-dismissible fade show" role="alert">
+        <div class="alert alert-info alert-dismissible fade show" role="alert">
             Showing filtered results.
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    @* Filters Form *@
-    <form asp-action="CategoryProductsEmployee" method="get" class="row g-3 mb-4">
-
-        <div class="col-md-3">
-            <label for="startDate" class="form-label">Start Production Date</label>
-            <input type="date" id="startDate" name="startDate" class="form-control" value="@(Context.Request.Query["startDate"])" />
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Filters</h5>
+            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filterForm" aria-expanded="false" aria-controls="filterForm">
+                <i class="bi bi-funnel me-2"></i> Toggle Filters
+            </button>
         </div>
 
-        <div class="col-md-3">
-            <label for="endDate" class="form-label">End Production Date</label>
-            <input type="date" id="endDate" name="endDate" class="form-control" value="@(Context.Request.Query["endDate"])" />
-        </div>
+        <div id="filterForm" class="collapse">
+            <div class="card-body">
+                <form asp-action="CategoryProductsEmployee" method="get" class="row g-3">
+                    
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" class="form-control" value="@(Context.Request.Query["startDate"])" />
+                    </div>
 
-        <div class="col-md-3">
-            <label for="sortBy" class="form-label">Sort By</label>
-            <select class="form-select" id="sortBy" name="sortBy">
-                <option value="name_asc" selected="@(Context.Request.Query["sortBy"] == "name_asc" ? "selected" : null)">Name A-Z</option>
-                <option value="name_desc" selected="@(Context.Request.Query["sortBy"] == "name_desc" ? "selected" : null)">Name Z-A</option>
-                <option value="date_asc" selected="@(Context.Request.Query["sortBy"] == "date_asc" ? "selected" : null)">Production Date ↑</option>
-                <option value="date_desc" selected="@(Context.Request.Query["sortBy"] == "date_desc" ? "selected" : null)">Production Date ↓</option>
-            </select>
-        </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" id="endDate" name="endDate" class="form-control" value="@(Context.Request.Query["endDate"])" />
+                    </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Apply Filters</button>
-            <a asp-action="CategoryProductsEmployee" class="btn btn-secondary">Reset</a>
+                    <div class="col-md-3">
+                        <label for="sortBy" class="form-label">Sort By</label>
+                        <select class="form-select" id="sortBy" name="sortBy">
+                            <option value="name_asc" selected="@(Context.Request.Query["sortBy"] == "name_asc" ? "selected" : null)">Name A-Z</option>
+                            <option value="name_desc" selected="@(Context.Request.Query["sortBy"] == "name_desc" ? "selected" : null)">Name Z-A</option>
+                            <option value="date_asc" selected="@(Context.Request.Query["sortBy"] == "date_asc" ? "selected" : null)">Production Date ↑</option>
+                            <option value="date_desc" selected="@(Context.Request.Query["sortBy"] == "date_desc" ? "selected" : null)">Production Date ↓</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                        <a asp-action="CategoryProductsEmployee" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Reset</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Apply Filters</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 
     @if (!Model.Any())
     {
@@ -83,12 +94,12 @@
             {
                 <div class="col">
                     <div class="card h-100 shadow-sm border-0">
-                        <div class="card-header bg-primary text-white">
+                        <div class="card-header bg-success text-white">
                             <h5 class="mb-0">@product.Name</h5>
                         </div>
                         <div class="card-body">
                             <p class="mb-2"><strong>Description:</strong> @product.Description</p>
-                            <p class="mb-2"><strong>Price:</strong> @product.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))</p>
+                            <p class="mb-2"><strong>Price:</strong> R @product.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))</p>
                             <p class="mb-2"><strong>Quantity:</strong> @product.Quantity</p>
                             <p class="mb-2"><strong>Production Date:</strong> @product.ProductionDate.ToString("dd-MMMM-yyyy")</p>
                             <p class="mb-2"><strong>Category:</strong> @product.CategoryName</p>

@@ -6,7 +6,7 @@
 
 <div class="container mt-4">
 
-    <h2 class="mb-4">My Products</h2>
+    <h2 class="mb-4 text-primary">My Products</h2>
 
     @* Success Message *@
     @if (ViewData["SuccessMessage"] != null)
@@ -40,48 +40,62 @@
         </div>
     }
 
-    <form asp-action="FarmerProductsIndex" method="get" class="row g-3 mb-4">
-        <div class="col-md-3">
-            <label for="category" class="form-label">Filter by Category</label>
-            <select class="form-select" id="category" name="category" asp-items="@ViewData["CategorySelectList"] as SelectList">
-                <option value="">-- All Categories --</option>
-            </select>
+    <div class="card shadow-sm mb-4 border-0">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Filters</h5>
+            <button class="btn btn-outline-primary btn-sm" type="button" data-bs-toggle="collapse" data-bs-target="#filterForm" aria-expanded="false" aria-controls="filterForm">
+                <i class="bi bi-funnel me-2"></i> Toggle Filters
+            </button>
         </div>
 
-        <div class="col-md-3">
-            <label for="startDate" class="form-label">Start Production Date</label>
-            <input type="date" id="startDate" name="startDate" class="form-control" value="@(Context.Request.Query["startDate"])" />
-        </div>
+        <div id="filterForm" class="collapse">
+            <div class="card-body">
+                <form asp-action="FarmerProductsIndex" method="get" class="row g-3">
+                    <div class="col-md-3">
+                        <label for="category" class="form-label">Category</label>
+                        <select class="form-select" id="category" name="category" asp-items="@ViewData["CategorySelectList"] as SelectList">
+                            <option value="">-- All Categories --</option>
+                        </select>
+                    </div>
 
-        <div class="col-md-3">
-            <label for="endDate" class="form-label">End Production Date</label>
-            <input type="date" id="endDate" name="endDate" class="form-control" value="@(Context.Request.Query["endDate"])" />
-        </div>
+                    <div class="col-md-3">
+                        <label for="startDate" class="form-label">Start Date</label>
+                        <input type="date" id="startDate" name="startDate" class="form-control" value="@(Context.Request.Query["startDate"])" />
+                    </div>
 
-        <div class="col-md-3">
-            <label for="sortBy" class="form-label">Sort By</label>
-            <select class="form-select" id="sortBy" name="sortBy">
-                <option value="name_asc" selected="@(Context.Request.Query["sortBy"] == "name_asc" ? "selected" : null)">Name A-Z</option>
-                <option value="name_desc" selected="@(Context.Request.Query["sortBy"] == "name_desc" ? "selected" : null)">Name Z-A</option>
-                <option value="date_asc" selected="@(Context.Request.Query["sortBy"] == "date_asc" ? "selected" : null)">Production Date ↑</option>
-                <option value="date_desc" selected="@(Context.Request.Query["sortBy"] == "date_desc" ? "selected" : null)">Production Date ↓</option>
-            </select>
-        </div>
+                    <div class="col-md-3">
+                        <label for="endDate" class="form-label">End Date</label>
+                        <input type="date" id="endDate" name="endDate" class="form-control" value="@(Context.Request.Query["endDate"])" />
+                    </div>
 
-        <div class="col-12">
-            <button type="submit" class="btn btn-primary">Apply Filters</button>
-            <a asp-action="FarmerProductsIndex" class="btn btn-secondary">Reset</a>
+                    <div class="col-md-3">
+                        <label for="sortBy" class="form-label">Sort By</label>
+                        <select class="form-select" id="sortBy" name="sortBy">
+                            <option value="name_asc" selected="@(Context.Request.Query["sortBy"] == "name_asc" ? "selected" : null)">Name A-Z</option>
+                            <option value="name_desc" selected="@(Context.Request.Query["sortBy"] == "name_desc" ? "selected" : null)">Name Z-A</option>
+                            <option value="date_asc" selected="@(Context.Request.Query["sortBy"] == "date_asc" ? "selected" : null)">Production Date ↑</option>
+                            <option value="date_desc" selected="@(Context.Request.Query["sortBy"] == "date_desc" ? "selected" : null)">Production Date ↓</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-2">
+                        <a asp-action="FarmerProductsIndex" class="btn btn-outline-secondary"><i class="bi bi-arrow-clockwise"></i> Reset</a>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-filter"></i> Apply Filters</button>
+                    </div>
+                </form>
+            </div>
         </div>
-    </form>
+    </div>
 
     @* No Products Available Message *@
     @if (!Model.Any())
     {
-        <div class="alert alert-info">No products available.</div>
+        <div class="alert alert-info text-center">
+            <i class="bi bi-info-circle"></i> No products available.
+        </div>
     }
     else
     {
-
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
             @foreach (var product in Model)
             {

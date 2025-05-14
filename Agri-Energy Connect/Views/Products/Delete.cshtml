@@ -4,97 +4,109 @@
     ViewData["Title"] = "Confirm Product Deletion";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
 
-    @* Success Message *@
+    <!-- Feedback Messages -->
     @if (ViewData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
-            @ViewData["SuccessMessage"]
+            <i class="bi bi-check-circle-fill me-2"></i>@ViewData["SuccessMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    @* Error Message *@
     @if (ViewData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
-            @ViewData["ErrorMessage"]
+            <i class="bi bi-x-octagon-fill me-2"></i>@ViewData["ErrorMessage"]
             <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
         </div>
     }
 
-    <div class="card shadow rounded-3 border-danger">
+    <!-- Card -->
+    <div class="card shadow-sm border-0 rounded-3">
         <div class="card-header bg-danger text-white d-flex align-items-center">
             <i class="bi bi-exclamation-triangle-fill fs-4 me-2"></i>
-            <h4 class="mb-0">Confirm Product Deletion</h4>
+            <h5 class="mb-0">Confirm Product Deletion</h5>
         </div>
+
         <div class="card-body">
-            <p class="text-danger fw-bold mb-4">Are you sure you want to permanently delete this product?</p>
+            <p class="text-danger fw-semibold mb-4">
+                This action is irreversible. Are you sure you want to permanently delete this product?
+            </p>
 
-            <div class="mb-3">
-                <label class="form-label">Product Name</label>
-                <input asp-for="Name" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <input asp-for="Description" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Price</label>
-                <input asp-for="Price" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Quantity</label>
-                <input asp-for="Quantity" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Category</label>
-                <input asp-for="CategoryName" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Farmer</label>
-                <input asp-for="FarmerName" class="form-control" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Production Date</label>
-                <input class="form-control" value="@Model.ProductionDate.ToString("dd MMMM yyyy")" readonly />
-            </div>
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Product Name</label>
+                    <input class="form-control" value="@Model.Name" readonly />
+                </div>
 
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Category</label>
+                    <input class="form-control" value="@Model.CategoryName ?? " N /A"" readonly />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea class="form-control" rows="3" readonly>@Model.Description</textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Price</label>
+                    <input class="form-control" value="@Model.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Quantity Available</label>
+                    <input class="form-control" value="@Model.Quantity" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Production Date</label>
+                    <input class="form-control" value="@Model.ProductionDate.ToString("yyyy-MM-dd")" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Farmer</label>
+                    <input class="form-control" value="@Model.FarmerName" readonly />
+                </div>
+            </div>
         </div>
-        <div class="card-footer d-flex justify-content-between gap-2">
-            
-            <a href="javascript:history.back()" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back
+
+        <div class="card-footer bg-light d-flex justify-content-between">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Back
             </a>
 
             <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#confirmDeleteModal">
-                <i class="bi bi-trash"></i> Delete
+                <i class="bi bi-trash-fill"></i> Delete
             </button>
         </div>
     </div>
 </div>
 
-@* Modal Component *@
+<!-- Delete Confirmation Modal -->
 <div class="modal fade" id="confirmDeleteModal" tabindex="-1" aria-labelledby="confirmDeleteModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-danger">
+        <div class="modal-content shadow-sm border border-danger rounded-3">
             <div class="modal-header bg-danger text-white">
                 <h5 class="modal-title" id="confirmDeleteModalLabel">
-                    <i class="bi bi-exclamation-circle me-2"></i> Confirm Deletion
+                    <i class="bi bi-exclamation-circle-fill me-2"></i>Confirm Deletion
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
+
             <div class="modal-body">
                 Are you absolutely sure you want to delete <strong>@Model.Name</strong>? This action cannot be undone.
             </div>
+
             <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
                     <i class="bi bi-x-circle"></i> Cancel
                 </button>
                 <form asp-action="DeleteConfirmed" asp-route-id="@Model.Id" method="post" class="d-inline">
                     <button type="submit" class="btn btn-danger">
-                        <i class="bi bi-check-circle"></i> Yes, Delete
+                        <i class="bi bi-check-circle-fill me-1"></i> Yes, Delete
                     </button>
                 </form>
             </div>
@@ -104,8 +116,8 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
-        // Optional: Automatically focus modal when shown
         const deleteModal = document.getElementById('confirmDeleteModal');
         deleteModal.addEventListener('shown.bs.modal', () => {
             deleteModal.querySelector('button[type="submit"]').focus();

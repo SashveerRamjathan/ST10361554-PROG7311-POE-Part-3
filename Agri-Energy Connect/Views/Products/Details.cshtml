@@ -4,9 +4,9 @@
     ViewData["Title"] = "Product Details";
 }
 
-<div class="container mt-4">
+<div class="container mt-5">
 
-    @* Success Message *@
+    <!-- Alerts -->
     @if (ViewData["SuccessMessage"] != null)
     {
         <div class="alert alert-success alert-dismissible fade show" role="alert">
@@ -15,7 +15,6 @@
         </div>
     }
 
-    @* Error Message *@
     @if (ViewData["ErrorMessage"] != null)
     {
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
@@ -24,54 +23,54 @@
         </div>
     }
 
-    <div class="card shadow rounded-3">
-        <div class="card-header bg-success text-white d-flex align-items-center">
-            <i class="bi bi-box-seam fs-4 me-2"></i>
-            <h4 class="mb-0">Product Details</h4>
+    <div class="card shadow-sm border-0 rounded-3">
+        <div class="card-header bg-primary text-white d-flex align-items-center">
+            <i class="bi bi-box-seam me-2 fs-4"></i>
+            <h5 class="mb-0">Product Details</h5>
         </div>
         <div class="card-body">
-            <div class="mb-3">
-                <label class="form-label">Product Name</label>
-                <input class="form-control" value="@Model.Name" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Description</label>
-                <textarea class="form-control" rows="3" readonly>@Model.Description</textarea>
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Price</label>
-                <input class="form-control" value="@Model.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Quantity Available</label>
-                <input class="form-control" value="@Model.Quantity" readonly />
-            </div>
-            <div class="mb-3">
-                <label class="form-label">Production Date</label>
-                <input class="form-control" value="@Model.ProductionDate.ToString("yyyy-MM-dd")" readonly />
-            </div>
 
-            @if (Model.CategoryName != null)
-            {
-                <div class="mb-3">
-                    <label class="form-label">Category</label>
-                    <input class="form-control" value="@Model.CategoryName" readonly />
+            <div class="row g-3">
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Product Name</label>
+                    <input class="form-control" value="@Model.Name" readonly />
                 </div>
-            }
 
-            @if (Model.FarmerName != null)
-            {
-                <div class="mb-3">
-                    <label class="form-label">Farmer</label>
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Category</label>
+                    <input class="form-control" value="@Model.CategoryName ?? " N /A"" readonly />
+                </div>
+
+                <div class="col-12">
+                    <label class="form-label fw-semibold">Description</label>
+                    <textarea class="form-control" rows="3" readonly>@Model.Description</textarea>
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Price</label>
+                    <input class="form-control" value="@Model.Price.ToString("C", System.Globalization.CultureInfo.GetCultureInfo("en-ZA"))" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Quantity Available</label>
+                    <input class="form-control" value="@Model.Quantity" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Production Date</label>
+                    <input class="form-control" value="@Model.ProductionDate.ToString("yyyy-MM-dd")" readonly />
+                </div>
+
+                <div class="col-md-6">
+                    <label class="form-label fw-semibold">Farmer</label>
                     <input class="form-control" value="@Model.FarmerName" readonly />
                 </div>
-            }
-
+            </div>
         </div>
-        <div class="card-footer d-flex justify-content-between gap-2">
 
-            <a href="javascript:history.back()" class="btn btn-secondary">
-                <i class="bi bi-arrow-left"></i> Back
+        <div class="card-footer bg-light d-flex justify-content-between">
+            <a href="javascript:history.back()" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left-circle"></i> Back
             </a>
 
             @if (User.Identity!.IsAuthenticated)

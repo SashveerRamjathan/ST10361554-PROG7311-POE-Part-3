@@ -6,88 +6,90 @@
 
 <div class="container mt-5">
     <div class="card shadow-lg border-0 rounded-4">
-        <div class="card-header bg-primary text-white rounded-top-4">
-            <h4 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Update Product Details</h4>
+        <div class="card-header bg-primary text-white d-flex align-items-center rounded-top-4">
+            <i class="bi bi-pencil-square fs-4 me-2"></i>
+            <h4 class="mb-0">Update Product Details</h4>
         </div>
 
         <form id="updateForm" asp-action="Edit" asp-controller="Products" method="post">
-            <div class="card-body px-4 py-3">
+            <div class="card-body px-4 py-3 row g-3">
 
                 <input type="hidden" asp-for="Id" />
 
-                <div class="mb-3">
+                <div class="col-md-6">
                     <label asp-for="Name" class="form-label fw-semibold">Product Name</label>
-                    <input asp-for="Name" class="form-control rounded-3" />
+                    <input asp-for="Name" class="form-control rounded-3" id="Name" />
                     <span asp-validation-for="Name" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="Description" class="form-label fw-semibold">Product Description</label>
-                    <input asp-for="Description" class="form-control rounded-3" />
-                    <span asp-validation-for="Description" class="text-danger small"></span>
-                </div>
-
-                <div class="mb-3">
+                <div class="col-md-6">
                     <label asp-for="Price" class="form-label fw-semibold">Product Price</label>
-                    <input asp-for="Price" class="form-control rounded-3" type="number"/>
+                    <input asp-for="Price" class="form-control rounded-3" type="number" id="Price" />
                     <span asp-validation-for="Price" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
+                <div class="col-md-6">
                     <label asp-for="Quantity" class="form-label fw-semibold">Product Quantity</label>
-                    <input asp-for="Quantity" class="form-control rounded-3" />
+                    <input asp-for="Quantity" class="form-control rounded-3" id="Quantity" />
                     <span asp-validation-for="Quantity" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
+                <div class="col-md-6">
                     <label asp-for="ProductionDate" class="form-label fw-semibold">Production Date</label>
-                    <input asp-for="ProductionDate" class="form-control rounded-3" type="date" />
+                    <input asp-for="ProductionDate" class="form-control rounded-3" type="date" id="ProductionDate" />
                     <span asp-validation-for="ProductionDate" class="text-danger small"></span>
                 </div>
 
-                <div class="mb-3">
-                    <label asp-for="CategoryId" class="form-label">Category</label>
-                    <select asp-for="CategoryId" class="form-select" asp-items="@(ViewData["CategorySelectList"] as SelectList)">
+                <div class="col-md-12">
+                    <label asp-for="Description" class="form-label fw-semibold">Product Description</label>
+                    <textarea asp-for="Description" class="form-control rounded-3" rows="3" id="Description"></textarea>
+                    <span asp-validation-for="Description" class="text-danger small"></span>
+                </div>
+
+                <div class="col-md-12">
+                    <label asp-for="CategoryId" class="form-label fw-semibold">Category</label>
+                    <select asp-for="CategoryId" class="form-select rounded-3" asp-items="@(ViewData["CategorySelectList"] as SelectList)" id="CategoryId">
                         <option value="">-- Select Category --</option>
                     </select>
                     <span asp-validation-for="CategoryId" class="text-danger small"></span>
                 </div>
 
-                <!-- Success and Error Messages -->
                 @if (TempData["SuccessMessage"] != null)
                 {
-                    <div class="alert alert-success" role="alert">
-                        @TempData["SuccessMessage"]
+                    <div class="alert alert-success alert-dismissible fade show mt-3" role="alert">
+                        <i class="bi bi-check-circle-fill me-2"></i>@TempData["SuccessMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
 
                 @if (TempData["ErrorMessage"] != null)
                 {
-                    <div class="alert alert-danger" role="alert">
-                        @TempData["ErrorMessage"]
+                    <div class="alert alert-danger alert-dismissible fade show mt-3" role="alert">
+                        <i class="bi bi-x-circle-fill me-2"></i>@TempData["ErrorMessage"]
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                     </div>
                 }
             </div>
 
-            <div class="card-footer d-flex justify-content-between px-4 py-3 bg-light border-top rounded-bottom-4">
+            <div class="card-footer d-flex justify-content-between align-items-center bg-light border-top rounded-bottom-4 px-4 py-3">
                 <a href="javascript:history.back()" class="btn btn-secondary">
-                    <i class="bi bi-x-circle"></i> Cancel
+                    <i class="bi bi-arrow-left-circle me-1"></i> Cancel
                 </a>
                 <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#confirmUpdateModal">
-                    <i class="bi bi-save"></i> Review & Confirm
+                    <i class="bi bi-save me-1"></i> Review & Confirm
                 </button>
             </div>
         </form>
     </div>
 </div>
 
-<!-- Modal -->
+<!-- Confirm Modal -->
 <div class="modal fade" id="confirmUpdateModal" tabindex="-1" aria-labelledby="confirmUpdateModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered modal-lg">
-        <div class="modal-content shadow">
-            <div class="modal-header bg-warning text-dark">
+        <div class="modal-content shadow rounded-4">
+            <div class="modal-header bg-warning text-dark rounded-top-4">
                 <h5 class="modal-title" id="confirmUpdateModalLabel">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Confirm Update
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i> Confirm Product Update
                 </h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
@@ -95,19 +97,19 @@
                 <p class="mb-3">You're about to update the following product details:</p>
                 <ul class="list-group">
                     <li class="list-group-item"><strong>Product Name:</strong> <span id="modalProductName"></span></li>
-                    <li class="list-group-item"><strong>Product Description:</strong> <span id="modalProductDescription"></span></li>
+                    <li class="list-group-item"><strong>Description:</strong> <span id="modalProductDescription"></span></li>
                     <li class="list-group-item"><strong>Price:</strong> <span id="modalProductPrice"></span></li>
                     <li class="list-group-item"><strong>Quantity:</strong> <span id="modalProductQuantity"></span></li>
                     <li class="list-group-item"><strong>Production Date:</strong> <span id="modalProductProductionDate"></span></li>
                     <li class="list-group-item"><strong>Category:</strong> <span id="modalProductCategory"></span></li>
                 </ul>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer rounded-bottom-4">
                 <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">
-                    Cancel
+                    <i class="bi bi-x-circle me-1"></i> Cancel
                 </button>
                 <button type="button" class="btn btn-success" onclick="submitForm()">
-                    <i class="bi bi-check-circle-fill me-1"></i>Confirm Update
+                    <i class="bi bi-check-circle-fill me-1"></i> Confirm Update
                 </button>
             </div>
         </div>
@@ -116,6 +118,7 @@
 
 @section Scripts {
     <partial name="_ValidationScriptsPartial" />
+
     <script>
         const form = document.getElementById("updateForm");
 
@@ -125,7 +128,6 @@
             form.submit();
         }
 
-        // Populate modal with form values
         document.querySelector('[data-bs-toggle="modal"]').addEventListener('click', () => {
             document.getElementById("modalProductName").innerText = document.getElementById("Name").value;
             document.getElementById("modalProductDescription").innerText = document.getElementById("Description").value;
