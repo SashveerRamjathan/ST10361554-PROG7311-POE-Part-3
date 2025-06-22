@@ -11,11 +11,6 @@
         "Path": "Agri_Energy_Connect_API\\Agri_Energy_Connect_API.csproj",
         "Action": "Start",
         "DebugTarget": "https"
-      },
-      {
-        "Path": "DataContextAndModels\\DataContextAndModels.csproj",
-        "Action": "Start",
-        "DebugTarget": "DataContextAndModels"
       }
     ]
   }
