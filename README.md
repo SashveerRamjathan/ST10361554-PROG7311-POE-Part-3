@@ -155,11 +155,12 @@ dotnet run
 
 ### Improvements Made
 
-- **Expanded Quick Start:** Added both Visual Studio and CLI instructions, including the new combined start profile.
-- **DB Details:** Explained SQLite setup, auto-seeding, and location; clarified that no script execution is needed.
-- **Cloning Instructions:** Clear, step-by-step directions for both Visual Studio and command line usage.
-- **Visual Aids:** Placeholder sections included for you to add images/screenshots.
-- **More Engaging Structure:** Added tables, emojis, and clearer sectioning for easier reading and navigation.
+- **Expanded Quick Start:** Added comprehensive setup instructions for both Visual Studio and command line, including the new "WebApp+API" combined startup profile for easy multi-project launch.
+- **Database Details:** Clarified SQLite usage, auto-seeding behavior, and database file location—no manual script execution required.
+- **Cloning Instructions:** Provided clear, step-by-step guidance for cloning the repository via Visual Studio and the command line.
+- **More Engaging Structure:** Incorporated tables, emojis, and organized sections for a more user-friendly and visually appealing README.
+- **Unified Startup Profile:** Configured a new startup profile to launch all three projects (Web App, API, Shared Library) simultaneously with a single action in Visual Studio.
+- **Website Improvements:** Updated the site icon (favicon) and introduced a dedicated About page for platform and project context.
 
 ---
 
