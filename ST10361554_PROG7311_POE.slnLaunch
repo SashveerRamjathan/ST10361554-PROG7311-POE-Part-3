@@ -1,0 +1,22 @@
+[
+  {
+    "Name": "WebApp+API",
+    "Projects": [
+      {
+        "Path": "Agri-Energy Connect\\Agri-Energy Connect.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "Agri_Energy_Connect_API\\Agri_Energy_Connect_API.csproj",
+        "Action": "Start",
+        "DebugTarget": "https"
+      },
+      {
+        "Path": "DataContextAndModels\\DataContextAndModels.csproj",
+        "Action": "Start",
+        "DebugTarget": "DataContextAndModels"
+      }
+    ]
+  }
+]
