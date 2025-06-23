@@ -6,6 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 using Newtonsoft.Json;
 using System.Text;
 
+/*
+    * Code Attribution
+    * Purpose: Consuming secured Web API endpoints from an ASP.NET Core MVC client using HttpClientFactory and JWT authentication
+    * Author: Microsoft Docs (adapted for Agri-Energy Connect)
+    * Date Accessed: 23 June 2025
+    * Source: Microsoft Learn - Call a web API from ASP.NET Core MVC
+    * URL: https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie#call-a-web-api-from-an-aspnet-core-app
+ */
+
+/*
+    * Controller: CategoriesController
+    * Description: Handles category listing, creation, and deletion for Agri-Energy Connect.
+    * Interacts with the backend API for CRUD operations and provides robust error handling and logging.
+ */
+
 namespace Agri_Energy_Connect.Controllers
 {
     public class CategoriesController : Controller
@@ -13,18 +28,22 @@ namespace Agri_Energy_Connect.Controllers
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<CategoriesController> _logger;
 
+        /// <summary>
+        /// Constructor for CategoriesController.
+        /// </summary>
         public CategoriesController(IHttpClientFactory httpClientFactory, ILogger<CategoriesController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
-        // GET: Categories
+        /// <summary>
+        /// Displays a list of all categories, sorted by product count.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Index()
         {
-            // Log the request
             _logger.LogInformation("Fetching all categories from the API.");
 
             try
@@ -43,46 +62,35 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _logger.LogWarning("No categories found.");
-
                     return View(new List<CategoryDto>());
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-
                     var categories = JsonConvert.DeserializeObject<List<CategoryDto>>(jsonResponse);
 
                     if (categories == null || categories.Count == 0)
                     {
                         _logger.LogWarning("No categories found.");
                         TempData["ErrorMessage"] = "No categories found.";
-
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return View(new List<CategoryDto>());
                     }
 
-                    // Log the number of categories found
                     _logger.LogInformation($"Successfully retrieved {categories.Count} categories from API.");
-
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                    // sort by number of products in descending order
+                    // Sort categories by number of products descending
                     categories = categories.OrderByDescending(c => c.NumberOfProducts).ToList();
 
-                    // Return the list of categories to the view
                     return View(categories);
-
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch categories. Status Code: {response.StatusCode}, Error: {errorMessage}");
-
                 TempData["ErrorMessage"] = "Failed to fetch categories. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
                 return View(new List<CategoryDto>());
@@ -90,16 +98,16 @@ namespace Agri_Energy_Connect.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error occurred while fetching categories from API.");
-
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
                 return View(new List<CategoryDto>());
             }
         }
 
-        // GET: Categories/Create
+        /// <summary>
+        /// Displays the category creation page.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public IActionResult Create()
@@ -107,7 +115,9 @@ namespace Agri_Energy_Connect.Controllers
             return View();
         }
 
-        // POST: Categories/Create
+        /// <summary>
+        /// Handles category creation POST, validates input, and reports errors.
+        /// </summary>
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -116,26 +126,19 @@ namespace Agri_Energy_Connect.Controllers
             if (model == null)
             {
                 _logger.LogWarning("Category model is null.");
-
                 TempData["ErrorMessage"] = "Category model is null.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View();
             }
 
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Invalid model state for category creation.");
-
-                // add error messages to TempData
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     TempData["ErrorMessage"] += error.ErrorMessage + "\n";
                 }
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(model);
             }
 
@@ -157,11 +160,8 @@ namespace Agri_Energy_Connect.Controllers
 
                 if (response.IsSuccessStatusCode)
                 {
-
-                    // Log the successful creation of the category
                     _logger.LogInformation($"Successfully created category: {model.Name}");
 
-                    // Deserialize the response to get the created category
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var createdCategory = JsonConvert.DeserializeObject<CategoryDto>(jsonResponse);
 
@@ -173,35 +173,31 @@ namespace Agri_Energy_Connect.Controllers
                         return View(model);
                     }
 
-                    // Log the successful creation of the category
                     _logger.LogInformation($"Successfully created category: {createdCategory.Name}");
                     TempData["SuccessMessage"] = "Category created successfully.";
-
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
 
                     return RedirectToAction(nameof(Index));
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to create category. Status Code: {response.StatusCode}, Error: {errorMessage}");
-
                 TempData["ErrorMessage"] = $"Failed to create category. {errorMessage}.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
                 return View(model);
-
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error occurred while creating category.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(model);
             }
         }
 
-        // GET: Categories/Delete/5
+        /// <summary>
+        /// Displays the delete confirmation page for a category.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Delete(string id)
@@ -251,30 +247,27 @@ namespace Agri_Energy_Connect.Controllers
                     }
 
                     _logger.LogInformation($"Successfully fetched category for deletion: {category.Name}");
-
                     return View(category);
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch category for deletion. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch category. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Index));
-
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Unexpected error occurred while deleting category.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Index));
             }
         }
 
-        // POST: Categories/Delete/5
+        /// <summary>
+        /// Handles category deletion POST, confirms and deletes the category.
+        /// </summary>
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -318,17 +311,13 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogInformation($"Successfully deleted category with ID: {id}.");
                     TempData["SuccessMessage"] = "Category deleted successfully.";
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-
                     return RedirectToAction(nameof(Index));
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to delete category. Status Code: {response.StatusCode}, Error: {errorMessage}");
-
                 TempData["ErrorMessage"] = "Failed to delete category. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Index));
             }
             catch (Exception ex)
@@ -336,7 +325,6 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "Unexpected error occurred while deleting category.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Index));
             }
         }

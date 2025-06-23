@@ -9,22 +9,42 @@ using Newtonsoft.Json;
 using System.Security.Claims;
 using System.Text;
 
+/*
+    * Code Attribution
+    * Purpose: Consuming a secured Web API with HttpClientFactory and JWT authentication in ASP.NET Core MVC,
+    *          implementing role-based authorization, robust error handling, and usage of TempData/ViewData for user messaging.
+    * Author: Microsoft Docs (adapted for Agri-Energy Connect)
+    * Date Accessed: 23 June 2025
+    * Source: Microsoft Learn - Call a web API from ASP.NET Core MVC
+    * URL: https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie#call-a-web-api-from-an-aspnet-core-app
+ */
+
+/*
+    * Controller: ProductsController
+    * Description: Manages product-related views and actions for Agri-Energy Connect.
+    * Interacts with backend API for CRUD operations on products, filtering, sorting, and product details.
+    * Provides category helpers and redirection logic for robust UX.
+ */
+
 namespace Agri_Energy_Connect.Controllers
 {
     public class ProductsController : Controller
     {
-
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly ILogger<ProductsController> _logger;
 
+        /// <summary>
+        /// Constructor for ProductsController.
+        /// </summary>
         public ProductsController(IHttpClientFactory httpClientFactory, ILogger<ProductsController> logger)
         {
             _httpClientFactory = httpClientFactory;
             _logger = logger;
         }
 
-
-        // GET: Products
+        /// <summary>
+        /// Displays a list of products with optional sorting, filtering, and date range.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Index(
@@ -33,8 +53,6 @@ namespace Agri_Energy_Connect.Controllers
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-
-            // log the request
             _logger.LogInformation("Fetching all products from the API.");
 
             try
@@ -53,60 +71,41 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _logger.LogWarning("No products found.");
-
                     return View(new List<ProductDto>());
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-
                     var products = JsonConvert.DeserializeObject<List<ProductDto>>(jsonResponse);
 
                     if (products == null || products.Count == 0)
                     {
                         _logger.LogWarning("No products found.");
-
                         TempData["ErrorMessage"] = "No products found.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return View(new List<ProductDto>());
                     }
 
-                    // log the number of products found
                     _logger.LogInformation($"Successfully retrieved {products.Count} products from API.");
-
                     SelectList selectListItems = await LoadCategories();
-
                     if (selectListItems == null || !selectListItems.Any())
                     {
-                        // log the warning
                         _logger.LogWarning("No categories found for selection.");
                         TempData["ErrorMessage"] = "No categories found for selection.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                     }
-
-                    // log the number of categories found
                     _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                    // Create a SelectList and pass it to the view via ViewData
                     ViewData["CategorySelectList"] = selectListItems;
-
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
                     // Filtering
                     if (!string.IsNullOrEmpty(category))
-                    {
                         products = products.Where(p => p.CategoryId.Equals(category)).ToList();
-                    }
-
                     if (startDate.HasValue && endDate.HasValue)
-                    {
                         products = products.Where(p => p.ProductionDate >= startDate && p.ProductionDate <= endDate).ToList();
-                    }
 
                     // Sorting
                     products = sortBy switch
@@ -115,51 +114,41 @@ namespace Agri_Energy_Connect.Controllers
                         "name_desc" => products.OrderByDescending(p => p.Name).ToList(),
                         "date_asc" => products.OrderBy(p => p.ProductionDate).ToList(),
                         "date_desc" => products.OrderByDescending(p => p.ProductionDate).ToList(),
-                        _ => products.OrderBy(p => p.Name).ToList() // default
+                        _ => products.OrderBy(p => p.Name).ToList()
                     };
 
                     return View(products);
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch products. Status Code: {response.StatusCode}, Error: {errorMessage}");
-
                 TempData["ErrorMessage"] = "Failed to fetch products. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching products from API.");
-
-
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
         }
 
-        // GET: Products/Details/5
+        /// <summary>
+        /// Displays product details for a given product ID.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Details(string id)
         {
-
             if (string.IsNullOrEmpty(id))
             {
                 _logger.LogWarning("Product ID is null or empty.");
                 TempData["ErrorMessage"] = "Product ID is null or empty.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
-
-            // log the request
             _logger.LogInformation($"Fetching product details for product ID: {id}");
 
             try
@@ -180,7 +169,6 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogWarning($"Product with ID {id} not found.");
                     TempData["ErrorMessage"] = $"Product with ID {id} not found.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return RedirectToRefererOrFallback();
                 }
                 if (response.IsSuccessStatusCode)
@@ -193,26 +181,19 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogError($"Product with ID {id} not found.");
                         TempData["ErrorMessage"] = $"Product with ID {id} not found.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return RedirectToRefererOrFallback();
                     }
-
-
-                    // log the product details
                     _logger.LogInformation($"Successfully retrieved product details for product ID: {id}");
-
                     TempData["SuccessMessage"] = "Product details retrieved successfully.";
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
 
                     return View(product);
                 }
-
                 var errorMessage = await response.Content.ReadAsStringAsync();
 
                 _logger.LogError($"Failed to fetch product details. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch product details. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
             catch (Exception ex)
@@ -220,52 +201,41 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while fetching product details from API.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
         }
 
-        // GET: Products/Create
+        /// <summary>
+        /// Displays the create product page for Farmers.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> Create()
         {
-            // log the request
             _logger.LogInformation("Navigating to create product page.");
 
             try
             {
                 SelectList selectListItems = await LoadCategories();
-
                 if (selectListItems == null || !selectListItems.Any())
                 {
-                    // log the warning
                     _logger.LogWarning("No categories found for selection.");
                     TempData["ErrorMessage"] = "No categories found for selection.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     ViewData["CategorySelectList"] = new SelectList(new List<Category>());
                 }
-
-                // log the number of categories found
                 _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                // Create a SelectList and pass it to the view via ViewData
                 ViewData["CategorySelectList"] = selectListItems;
 
-                // get the user ID from the claims
                 var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-
                 if (string.IsNullOrEmpty(userId))
                 {
                     _logger.LogWarning("User ID is null or empty.");
                     TempData["ErrorMessage"] = "User ID is null or empty.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return RedirectToAction("Login", "Account");
                 }
 
-                // create a new product view model
                 var productCreateViewModel = new ProductCreateViewModel
                 {
                     FarmerId = userId,
@@ -274,7 +244,6 @@ namespace Agri_Energy_Connect.Controllers
 
                 ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(productCreateViewModel);
             }
             catch (Exception ex)
@@ -282,70 +251,53 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while fetching categories.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallbackFarmer();
             }
         }
 
-        // POST: Products/Create
+        /// <summary>
+        /// Handles product create POST for Farmers.
+        /// </summary>
         [HttpPost]
         [Authorize(Roles = "Farmer")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(ProductCreateViewModel model)
         {
-
             if (model == null)
             {
                 _logger.LogWarning("Product model is null.");
                 TempData["ErrorMessage"] = "Product model is null.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Create));
             }
 
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Invalid model state for product creation.");
-
-
-                // add validation errors to TempData
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     TempData["ErrorMessage"] += error.ErrorMessage + "\n";
                 }
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 SelectList selectListItems = await LoadCategories();
-
                 if (selectListItems == null || !selectListItems.Any())
                 {
-                    // log the warning
                     _logger.LogWarning("No categories found for selection.");
                     TempData["ErrorMessage"] = "No categories found for selection.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                 }
-
-                // log the number of categories found
                 _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                // Create a SelectList and pass it to the view via ViewData
                 ViewData["CategorySelectList"] = selectListItems;
-
                 return View(model);
             }
 
-            // log the request
             _logger.LogInformation("Creating new product.");
 
             try
             {
                 var client = _httpClientFactory.CreateClient("AgriEnergyAPI");
                 client.AddJwtFromCookies(Request);
-
-
 
                 var jsonProduct = JsonConvert.SerializeObject(model);
                 var content = new StringContent(jsonProduct, Encoding.UTF8, "application/json");
@@ -361,24 +313,18 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.BadRequest)
                 {
                     var error = await response.Content.ReadAsStringAsync();
-
                     _logger.LogWarning($"Bad request while creating product. Error: {error}");
                     TempData["ErrorMessage"] = "Failed to create product. Please check your input.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return RedirectToAction(nameof(Create));
                 }
 
-                // log the response status code
                 _logger.LogInformation($"Response status code: {response.StatusCode}");
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // log the successful creation
                     _logger.LogInformation($"Product created successfully: {model.Name}.");
-
                     var jsonResponse = await response.Content.ReadAsStringAsync();
-
                     var createdProduct = JsonConvert.DeserializeObject<dynamic>(jsonResponse);
 
                     if (createdProduct == null)
@@ -386,39 +332,33 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogError("Failed to create product. No response from API.");
                         TempData["ErrorMessage"] = "Failed to create product. Please try again later.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return RedirectToRefererOrFallbackFarmer();
                     }
 
-                    // log the successful creation
                     _logger.LogInformation($"Product created successfully with ID: {createdProduct.id}");
-
                     TempData["SuccessMessage"] = "Product created successfully.";
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-
                     return RedirectToRefererOrFallbackFarmer();
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
                 _logger.LogError($"Failed to create product. Status Code: {response.StatusCode}, Error: {errorMessage}");
-
                 TempData["ErrorMessage"] = "Failed to create product. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Create));
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while creating the product.");
-
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction(nameof(Create));
             }
         }
 
-        // GET: Products/Edit/5
+        /// <summary>
+        /// Displays the edit product view for a given product ID.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Edit(string id)
@@ -430,8 +370,6 @@ namespace Agri_Energy_Connect.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
                 return RedirectToRefererOrFallback();
             }
-
-            // log the request
             _logger.LogInformation($"Fetching product for editing with ID: {id}");
 
             try
@@ -465,14 +403,11 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogError($"Product with ID {id} not found.");
                         TempData["ErrorMessage"] = $"Product with ID {id} not found.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return RedirectToRefererOrFallback();
                     }
 
-                    // log the product details
                     _logger.LogInformation($"Successfully retrieved product for editing with ID: {id}");
 
-                    // create a view model for editing
                     var productUpdateViewModel = new ProductUpdateViewModel
                     {
                         Id = product.Id,
@@ -484,54 +419,43 @@ namespace Agri_Energy_Connect.Controllers
                         CategoryId = product.CategoryId
                     };
 
-                    // load categories for the select list
                     SelectList selectListItems = await LoadCategories(productUpdateViewModel.CategoryId);
-
                     if (selectListItems == null || !selectListItems.Any())
                     {
-                        // log the warning
                         _logger.LogWarning("No categories found for selection.");
                         TempData["ErrorMessage"] = "No categories found for selection.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                     }
-
-                    // log the number of categories found
                     _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                    // Create a SelectList and pass it to the view via ViewData
                     ViewData["CategorySelectList"] = selectListItems;
 
                     return View(productUpdateViewModel);
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch product for editing. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch product for editing. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching product for editing.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
         }
 
-        // POST: Products/Edit
+        /// <summary>
+        /// Handles product update POST.
+        /// </summary>
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(ProductUpdateViewModel model)
         {
-
             if (model == null)
             {
                 _logger.LogWarning("Product model is null.");
@@ -543,34 +467,23 @@ namespace Agri_Energy_Connect.Controllers
             if (!ModelState.IsValid)
             {
                 _logger.LogWarning("Invalid model state for product update.");
-                // add validation errors to TempData
                 foreach (var error in ModelState.Values.SelectMany(v => v.Errors))
                 {
                     TempData["ErrorMessage"] += error.ErrorMessage + "\n";
                 }
-
                 SelectList selectListItems = await LoadCategories(model.CategoryId);
-
                 if (selectListItems == null || !selectListItems.Any())
                 {
-                    // log the warning
                     _logger.LogWarning("No categories found for selection.");
                     TempData["ErrorMessage"] = "No categories found for selection.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                 }
-
-                // log the number of categories found
                 _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                // Create a SelectList and pass it to the view via ViewData
                 ViewData["CategorySelectList"] = selectListItems;
-
                 return View(model);
             }
 
-            // log the request
             _logger.LogInformation($"Updating product with ID: {model.Id}");
 
             try
@@ -594,15 +507,12 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogWarning($"Product with ID {model.Id} not found.");
                     TempData["ErrorMessage"] = $"Product with ID {model.Id} not found.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return RedirectToRefererOrFallback();
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // log the successful update
                     _logger.LogInformation($"Product updated successfully: {model.Name}.");
-
                     var jsonResponse = await response.Content.ReadAsStringAsync();
                     var updatedProduct = JsonConvert.DeserializeObject<ProductDto>(jsonResponse);
 
@@ -611,24 +521,19 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogError($"Failed to update product. No response from API.");
                         TempData["ErrorMessage"] = "Failed to update product. Please try again later.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return RedirectToRefererOrFallback();
                     }
 
-                    // log the successful update
                     _logger.LogInformation($"Product updated successfully with ID: {updatedProduct.Id}");
                     TempData["SuccessMessage"] = "Product updated successfully.";
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-
                     return RedirectToAction(nameof(Details), new { id = updatedProduct.Id });
                 }
 
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to update product. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to update product. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(model);
             }
             catch (Exception ex)
@@ -636,12 +541,13 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while updating the product.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(model);
             }
         }
 
-        // GET: Products/Delete/5
+        /// <summary>
+        /// Displays the delete confirmation view for a product.
+        /// </summary>
         [HttpGet]
         [Authorize]
         public async Task<IActionResult> Delete(string id)
@@ -653,8 +559,6 @@ namespace Agri_Energy_Connect.Controllers
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
                 return RedirectToRefererOrFallback();
             }
-
-            // log the request
             _logger.LogInformation($"Fetching product for deletion with ID: {id}");
 
             try
@@ -675,7 +579,6 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogWarning($"Product with ID {id} not found.");
                     TempData["ErrorMessage"] = $"Product with ID {id} not found.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return RedirectToRefererOrFallback();
                 }
 
@@ -689,19 +592,15 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogError($"Product with ID {id} not found.");
                         TempData["ErrorMessage"] = $"Product with ID {id} not found.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return RedirectToRefererOrFallback();
                     }
-                    // log the product details
                     _logger.LogInformation($"Successfully retrieved product for deletion with ID: {id}");
                     return View(product);
                 }
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch product for deletion. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch product for deletion. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
             catch (Exception ex)
@@ -709,12 +608,13 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while fetching product for deletion.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
         }
 
-        // POST: Products/Delete/5
+        /// <summary>
+        /// Handles product deletion POST.
+        /// </summary>
         [HttpPost]
         [Authorize]
         [ValidateAntiForgeryToken]
@@ -724,11 +624,8 @@ namespace Agri_Energy_Connect.Controllers
             {
                 _logger.LogWarning("Product ID is null or empty.");
                 TempData["ErrorMessage"] = "Product ID is null or empty.";
-
                 return RedirectToRefererOrFallback();
             }
-
-            // log the request
             _logger.LogInformation($"Deleting product with ID: {id}");
 
             try
@@ -749,17 +646,14 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogWarning($"Product with ID {id} not found.");
                     TempData["ErrorMessage"] = $"Product with ID {id} not found.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return RedirectToRefererOrFallback();
                 }
 
                 if (response.IsSuccessStatusCode)
                 {
-                    // log the successful deletion
                     _logger.LogInformation($"Product deleted successfully with ID: {id}");
                     TempData["SuccessMessage"] = "Product deleted successfully.";
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
-
                     return RedirectToRefererOrFallback();
                 }
 
@@ -767,7 +661,6 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError($"Failed to delete product. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to delete product. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
             catch (Exception ex)
@@ -775,12 +668,13 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while deleting the product.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToRefererOrFallback();
             }
         }
 
-        // GET: Products/FarmerProductsIndex
+        /// <summary>
+        /// Displays the farmer's products for the currently logged-in Farmer.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Farmer")]
         public async Task<IActionResult> FarmerProductsIndex(
@@ -789,7 +683,6 @@ namespace Agri_Energy_Connect.Controllers
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-            // get the user ID from the claims
             var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
 
             if (string.IsNullOrEmpty(userId))
@@ -797,11 +690,8 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogWarning("User ID is null or empty.");
                 TempData["ErrorMessage"] = "User ID is null or empty.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction("Login", "Account");
             }
-
-            // log the request
             _logger.LogInformation($"Fetching products for farmer with ID: {userId}");
 
             try
@@ -820,7 +710,6 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _logger.LogWarning($"No products found for farmer with ID {userId}.");
-
                     return View(new List<ProductDto>());
                 }
 
@@ -834,63 +723,44 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogWarning($"No products found for farmer with ID {userId}.");
                         TempData["ErrorMessage"] = $"No products found for farmer with ID {userId}.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return View(new List<ProductDto>());
                     }
-
-                    // log the number of products found
                     _logger.LogInformation($"Successfully retrieved {products.Count} products for farmer with ID: {userId}");
 
                     SelectList selectListItems = await LoadCategories();
-
                     if (selectListItems == null || !selectListItems.Any())
                     {
-                        // log the warning
                         _logger.LogWarning("No categories found for selection.");
                         TempData["ErrorMessage"] = "No categories found for selection.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                     }
-
-                    // log the number of categories found
                     _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                    // Create a SelectList and pass it to the view via ViewData
                     ViewData["CategorySelectList"] = selectListItems;
-
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                    // Filtering
+                    // Filtering and sorting
                     if (!string.IsNullOrEmpty(category))
-                    {
                         products = products.Where(p => p.CategoryId.Equals(category)).ToList();
-                    }
-
                     if (startDate.HasValue && endDate.HasValue)
-                    {
                         products = products.Where(p => p.ProductionDate >= startDate && p.ProductionDate <= endDate).ToList();
-                    }
 
-                    // Sorting
                     products = sortBy switch
                     {
                         "name_asc" => products.OrderBy(p => p.Name).ToList(),
                         "name_desc" => products.OrderByDescending(p => p.Name).ToList(),
                         "date_asc" => products.OrderBy(p => p.ProductionDate).ToList(),
                         "date_desc" => products.OrderByDescending(p => p.ProductionDate).ToList(),
-                        _ => products.OrderBy(p => p.Name).ToList() // default
+                        _ => products.OrderBy(p => p.Name).ToList()
                     };
 
                     return View(products);
                 }
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch farmer's products. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch farmer's products. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
             catch (Exception ex)
@@ -898,12 +768,13 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while fetching farmer's products from API.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
         }
 
-        // GET: Products/FarmerProductsEmployee
+        /// <summary>
+        /// Displays a farmer's products to the employee.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> FarmerProductsEmployee(
@@ -913,17 +784,13 @@ namespace Agri_Energy_Connect.Controllers
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-
             if (string.IsNullOrEmpty(id))
             {
                 _logger.LogWarning("Farmer ID is null or empty.");
                 TempData["ErrorMessage"] = "Farmer ID is null or empty.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction("FarmerManagement", "Index");
             }
-
-            // log the request
             _logger.LogInformation($"Fetching products for farmer with ID: {id}");
 
             try
@@ -942,7 +809,6 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _logger.LogWarning($"No products found for farmer with ID {id}.");
-
                     return View(new List<ProductDto>());
                 }
 
@@ -956,63 +822,44 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogWarning($"No products found for farmer with ID {id}.");
                         TempData["ErrorMessage"] = $"No products found for farmer with ID {id}.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return View(new List<ProductDto>());
                     }
-
-                    // log the number of products found
                     _logger.LogInformation($"Successfully retrieved {products.Count} products for farmer with ID: {id}");
 
                     SelectList selectListItems = await LoadCategories();
-
                     if (selectListItems == null || !selectListItems.Any())
                     {
-                        // log the warning
                         _logger.LogWarning("No categories found for selection.");
                         TempData["ErrorMessage"] = "No categories found for selection.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                     }
-
-                    // log the number of categories found
                     _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                    // Create a SelectList and pass it to the view via ViewData
                     ViewData["CategorySelectList"] = selectListItems;
-
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                    // Filtering
+                    // Filtering and sorting
                     if (!string.IsNullOrEmpty(category))
-                    {
                         products = products.Where(p => p.CategoryId.Equals(category)).ToList();
-                    }
-
                     if (startDate.HasValue && endDate.HasValue)
-                    {
                         products = products.Where(p => p.ProductionDate >= startDate && p.ProductionDate <= endDate).ToList();
-                    }
 
-                    // Sorting
                     products = sortBy switch
                     {
                         "name_asc" => products.OrderBy(p => p.Name).ToList(),
                         "name_desc" => products.OrderByDescending(p => p.Name).ToList(),
                         "date_asc" => products.OrderBy(p => p.ProductionDate).ToList(),
                         "date_desc" => products.OrderByDescending(p => p.ProductionDate).ToList(),
-                        _ => products.OrderBy(p => p.Name).ToList() // default
+                        _ => products.OrderBy(p => p.Name).ToList()
                     };
 
                     return View(products);
                 }
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch farmer's products. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch farmer's products. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
             catch (Exception ex)
@@ -1020,12 +867,13 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while fetching farmer's products from API.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
         }
 
-        // GET: Products/CategoryProductsEmployee
+        /// <summary>
+        /// Displays all products in a category to the employee.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Employee")]
         public async Task<IActionResult> CategoryProductsEmployee(
@@ -1034,17 +882,13 @@ namespace Agri_Energy_Connect.Controllers
             DateTime? startDate = null,
             DateTime? endDate = null)
         {
-
             if (string.IsNullOrEmpty(id))
             {
                 _logger.LogWarning("Category ID is null or empty.");
                 TempData["ErrorMessage"] = "Category ID is null or empty.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return RedirectToAction("Categories", "Index");
             }
-
-            // log the request
             _logger.LogInformation($"Fetching products for Category with ID: {id}");
 
             try
@@ -1063,7 +907,6 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     _logger.LogWarning($"No products found for Category with ID {id}.");
-
                     return View(new List<ProductDto>());
                 }
 
@@ -1077,58 +920,42 @@ namespace Agri_Energy_Connect.Controllers
                         _logger.LogWarning($"No products found for Category with ID {id}.");
                         TempData["ErrorMessage"] = $"No products found for Category with ID {id}.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         return View(new List<ProductDto>());
                     }
-
-                    // log the number of products found
                     _logger.LogInformation($"Successfully retrieved {products.Count} products for Category with ID: {id}");
 
                     SelectList selectListItems = await LoadCategories();
-
                     if (selectListItems == null || !selectListItems.Any())
                     {
-                        // log the warning
                         _logger.LogWarning("No categories found for selection.");
                         TempData["ErrorMessage"] = "No categories found for selection.";
                         ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                         ViewData["CategorySelectList"] = new SelectList(new List<CategoryDto>());
                     }
-
-                    // log the number of categories found
                     _logger.LogInformation($"Loaded {selectListItems!.Count()} categories for selection.");
-
-                    // Create a SelectList and pass it to the view via ViewData
                     ViewData["CategorySelectList"] = selectListItems;
-
                     ViewData["SuccessMessage"] = TempData["SuccessMessage"];
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
 
-                    // Filtering
+                    // Filtering and sorting
                     if (startDate.HasValue && endDate.HasValue)
-                    {
                         products = products.Where(p => p.ProductionDate >= startDate && p.ProductionDate <= endDate).ToList();
-                    }
 
-                    // Sorting
                     products = sortBy switch
                     {
                         "name_asc" => products.OrderBy(p => p.Name).ToList(),
                         "name_desc" => products.OrderByDescending(p => p.Name).ToList(),
                         "date_asc" => products.OrderBy(p => p.ProductionDate).ToList(),
                         "date_desc" => products.OrderByDescending(p => p.ProductionDate).ToList(),
-                        _ => products.OrderBy(p => p.Name).ToList() // default
+                        _ => products.OrderBy(p => p.Name).ToList()
                     };
 
                     return View(products);
                 }
                 var errorMessage = await response.Content.ReadAsStringAsync();
-
                 _logger.LogError($"Failed to fetch Categories products. Status Code: {response.StatusCode}, Error: {errorMessage}");
                 TempData["ErrorMessage"] = "Failed to fetch Categories products. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
             catch (Exception ex)
@@ -1136,21 +963,20 @@ namespace Agri_Energy_Connect.Controllers
                 _logger.LogError(ex, "An error occurred while fetching Categories products from API.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return View(new List<ProductDto>());
             }
         }
 
+        #region Category Helper Methods
 
-        #region Category Helper Method
-
+        /// <summary>
+        /// Loads categories for SelectList, optionally setting a default selection.
+        /// </summary>
         private async Task<SelectList> LoadCategories()
         {
             _logger.LogInformation("Getting categories from API");
-
             try
             {
-
                 var client = _httpClientFactory.CreateClient("AgriEnergyAPI");
                 client.AddJwtFromCookies(Request);
 
@@ -1159,18 +985,15 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     _logger.LogWarning("Unauthorized access to categories API.");
-
                     return new SelectList(new List<CategoryDto>());
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
-
                     _logger.LogError($"Failed to fetch categories: {response.StatusCode} - {error}");
                     TempData["ErrorMessage"] = "Could not retrieve categories. Please try again later.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return new SelectList(new List<CategoryDto>());
                 }
 
@@ -1182,25 +1005,18 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogWarning("No categories found.");
                     TempData["ErrorMessage"] = "No categories found.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return new SelectList(new List<CategoryDto>());
                 }
 
-                // Create a SelectList and return
-                SelectList selectListItems = new SelectList(categories, "Id", "Name");
-
-                // order the categories by name
-                selectListItems = new SelectList(categories.OrderBy(c => c.Name), "Id", "Name");
-
+                // Order categories by name
+                SelectList selectListItems = new SelectList(categories.OrderBy(c => c.Name), "Id", "Name");
                 return selectListItems;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching categories.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return new SelectList(new List<CategoryDto>());
             }
         }
@@ -1208,10 +1024,8 @@ namespace Agri_Energy_Connect.Controllers
         private async Task<SelectList> LoadCategories(string defaultSelectedValue)
         {
             _logger.LogInformation("Getting categories from API");
-
             try
             {
-
                 var client = _httpClientFactory.CreateClient("AgriEnergyAPI");
                 client.AddJwtFromCookies(Request);
 
@@ -1220,18 +1034,15 @@ namespace Agri_Energy_Connect.Controllers
                 if (response.StatusCode == System.Net.HttpStatusCode.Unauthorized)
                 {
                     _logger.LogWarning("Unauthorized access to categories API.");
-
                     return new SelectList(new List<CategoryDto>());
                 }
 
                 if (!response.IsSuccessStatusCode)
                 {
                     var error = await response.Content.ReadAsStringAsync();
-
                     _logger.LogError($"Failed to fetch categories: {response.StatusCode} - {error}");
                     TempData["ErrorMessage"] = "Could not retrieve categories. Please try again later.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return new SelectList(new List<CategoryDto>());
                 }
 
@@ -1243,25 +1054,17 @@ namespace Agri_Energy_Connect.Controllers
                     _logger.LogWarning("No categories found.");
                     TempData["ErrorMessage"] = "No categories found.";
                     ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                     return new SelectList(new List<CategoryDto>());
                 }
 
-                // Create a SelectList and return
-                SelectList selectListItems = new SelectList(categories, "Id", "Name", defaultSelectedValue);
-
-                // order the categories by name
-                selectListItems = new SelectList(categories.OrderBy(c => c.Name), "Id", "Name", defaultSelectedValue);
-
+                SelectList selectListItems = new SelectList(categories.OrderBy(c => c.Name), "Id", "Name", defaultSelectedValue);
                 return selectListItems;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "An error occurred while fetching categories.");
                 TempData["ErrorMessage"] = "An unexpected error occurred. Please try again later.";
-
                 ViewData["ErrorMessage"] = TempData["ErrorMessage"];
-
                 return new SelectList(new List<CategoryDto>());
             }
         }
@@ -1270,49 +1073,44 @@ namespace Agri_Energy_Connect.Controllers
 
         #region Redirection Helpers
 
+        /// <summary>
+        /// Redirects to HTTP referer or Employee fallback.
+        /// </summary>
         private IActionResult RedirectToRefererOrFallbackEmployee()
         {
             var referer = Request.Headers["Referer"].ToString();
-
             if (!string.IsNullOrEmpty(referer))
-            {
                 return Redirect(referer);
-            }
-
-            return RedirectToAction("FarmerManagement", "Index"); // Fallback if no referer
+            return RedirectToAction("FarmerManagement", "Index");
         }
 
+        /// <summary>
+        /// Redirects to HTTP referer or Farmer fallback.
+        /// </summary>
         private IActionResult RedirectToRefererOrFallbackFarmer()
         {
             var referer = Request.Headers["Referer"].ToString();
-
             if (!string.IsNullOrEmpty(referer))
-            {
                 return Redirect(referer);
-            }
-            return RedirectToAction(nameof(FarmerProductsIndex)); // Fallback if no referer
+            return RedirectToAction(nameof(FarmerProductsIndex));
         }
 
+        /// <summary>
+        /// Redirects to HTTP referer or Index fallback.
+        /// </summary>
         private IActionResult RedirectToRefererOrFallback()
         {
             var referer = Request.Headers["Referer"].ToString();
-
             if (!string.IsNullOrEmpty(referer))
             {
-                // Check if referer contains delete actions
                 if (referer.Contains("Delete", StringComparison.OrdinalIgnoreCase) ||
                     referer.Contains("DeleteConfirmed", StringComparison.OrdinalIgnoreCase))
-                {
                     return RedirectToAction(nameof(Index));
-                }
-
                 return Redirect(referer);
             }
-
-            return RedirectToAction(nameof(Index)); // Fallback if no referer
+            return RedirectToAction(nameof(Index));
         }
 
         #endregion
     }
 }
-

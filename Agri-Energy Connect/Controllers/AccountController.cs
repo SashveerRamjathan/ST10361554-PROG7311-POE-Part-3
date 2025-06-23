@@ -10,6 +10,27 @@ using System.Net;
 using System.Security.Claims;
 using System.Text;
 
+/*
+    * Code Attribution
+    * Purpose: Implementing user authentication and authorization using JWT tokens with ASP.NET Core MVC,
+    *          including secure login/logout with cookie authentication, role-based access control,
+    *          user registration with API integration, and comprehensive logging and error handling.
+    * Author: Adapted from Microsoft ASP.NET Core Identity and Authentication documentation and best practices
+    * Date Accessed: 23 June 2025
+    * Sources:
+    * - https://learn.microsoft.com/en-us/aspnet/core/security/authentication/cookie
+    * - https://learn.microsoft.com/en-us/aspnet/core/security/authorization/roles
+    * - https://learn.microsoft.com/en-us/aspnet/core/security/authentication/jwt
+ */
+
+
+/*
+    * Controller: AccountController
+    * Description: Handles authentication and registration logic for Agri-Energy Connect users.
+    * Supports user login and logout, error handling, and farmer registration (by employees).
+    * Uses JWT tokens for authentication and sets authentication cookies.
+ */
+
 namespace Agri_Energy_Connect.Controllers
 {
     public class AccountController : Controller
@@ -18,6 +39,9 @@ namespace Agri_Energy_Connect.Controllers
         private readonly IConfiguration _configuration;
         private readonly ILogger<AccountController> _logger;
 
+        /// <summary>
+        /// Constructor for AccountController.
+        /// </summary>
         public AccountController(IHttpClientFactory httpClientFactory, IConfiguration configuration, ILogger<AccountController> logger)
         {
             _httpClientFactory = httpClientFactory;
@@ -25,14 +49,18 @@ namespace Agri_Energy_Connect.Controllers
             _logger = logger;
         }
 
-        // GET: /Account/Login
+        /// <summary>
+        /// Displays the login page.
+        /// </summary>
         [HttpGet]
         public IActionResult Login()
         {
             return View();
         }
 
-        // POST: /Account/Login
+        /// <summary>
+        /// Handles user login POST, validates credentials, sets cookies, and redirects by role.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Login(LoginViewModel model)
@@ -44,15 +72,12 @@ namespace Agri_Energy_Connect.Controllers
                 {
                     _logger.LogError(error.ErrorMessage);
                 }
-
                 return View(model);
             }
 
             var client = _httpClientFactory.CreateClient("AgriEnergyAPI");
-
             var jsonContent = JsonConvert.SerializeObject(model);
             var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
-
             var response = await client.PostAsync("/api/auth/login", content);
 
             // Log that the request was sent
@@ -63,7 +88,7 @@ namespace Agri_Energy_Connect.Controllers
                 var responseBody = await response.Content.ReadAsStringAsync();
                 var responseObj = JsonConvert.DeserializeObject<dynamic>(responseBody);
 
-                // if the response is null or doesn't contain expected properties, log the error
+                // If the response is null or doesn't contain expected properties, log the error
                 if (responseObj == null)
                 {
                     ModelState.AddModelError(string.Empty, "Login failed: Invalid response from server.");
@@ -81,18 +106,18 @@ namespace Agri_Energy_Connect.Controllers
                 string token = responseObj.token.ToString();
                 string userId = responseObj.id.ToString();
 
-                // Log the received token
+                // Log the received token and user ID
                 _logger.LogInformation($"Received token: {token}");
                 _logger.LogInformation($"User ID: {userId}");
 
-                // Decode token
+                // Decode JWT token
                 var handler = new JwtSecurityTokenHandler();
                 var jwtToken = handler.ReadJwtToken(token);
 
                 // Create claims from JWT
                 var claims = jwtToken.Claims.ToList();
 
-                // Optional: add extra claims
+                // Add extra claims for use across the app
                 claims.Add(new Claim("AccessToken", token));
                 claims.Add(new Claim(ClaimTypes.Name, model.Email));
                 claims.Add(new Claim(ClaimTypes.NameIdentifier, userId));
@@ -101,7 +126,7 @@ namespace Agri_Energy_Connect.Controllers
                 var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var principal = new ClaimsPrincipal(identity);
 
-                // Sign in user
+                // Sign in user with authentication cookie
                 await HttpContext.SignInAsync(
                     CookieAuthenticationDefaults.AuthenticationScheme,
                     principal,
@@ -111,7 +136,7 @@ namespace Agri_Energy_Connect.Controllers
                         ExpiresUtc = DateTime.UtcNow.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpireHours"]))
                     });
 
-                // Also store token in cookie (for API usage)
+                // Store token in HttpOnly cookie for API usage
                 var cookieOptions = new CookieOptions
                 {
                     HttpOnly = true,
@@ -119,19 +144,16 @@ namespace Agri_Energy_Connect.Controllers
                     SameSite = SameSiteMode.Strict,
                     Expires = DateTime.Now.AddHours(Convert.ToDouble(_configuration["JwtSettings:ExpireHours"]))
                 };
-
                 Response.Cookies.Append("AuthToken", token, cookieOptions);
 
                 // Log successful login
                 _logger.LogInformation($"User {model.Email} logged in successfully.");
 
-                // redirect user according to their role
+                // Redirect user according to their role
                 var roleClaim = claims.FirstOrDefault(c => c.Type == ClaimTypes.Role);
-
                 if (roleClaim != null)
                 {
                     var role = roleClaim.Value;
-                    
                     if (role == "Farmer")
                     {
                         return RedirectToAction("FarmerIndex", "Home");
@@ -141,9 +163,7 @@ namespace Agri_Energy_Connect.Controllers
                         return RedirectToAction("EmployeeIndex", "Home");
                     }
                 }
-
                 return RedirectToAction("Index", "Home");
-
             }
 
             // Read error message from API if available
@@ -154,12 +174,14 @@ namespace Agri_Energy_Connect.Controllers
             return View(model);
         }
 
+        /// <summary>
+        /// Logs the user out and clears authentication cookies.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Logout()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
-
             Response.Cookies.Delete("AuthToken"); // Clear the AuthToken cookie
 
             // Log successful logout
@@ -168,14 +190,18 @@ namespace Agri_Energy_Connect.Controllers
             return RedirectToAction("Index", "Home");
         }
 
-        // GET: Account/AccessDenied
+        /// <summary>
+        /// Displays the Access Denied page.
+        /// </summary>
         [HttpGet]
         public IActionResult AccessDenied()
         {
             return View();
         }
 
-        // GET: Account/RegisterFarmer
+        /// <summary>
+        /// Displays the Farmer registration page for Employees.
+        /// </summary>
         [HttpGet]
         [Authorize(Roles = "Employee")]
         public IActionResult RegisterFarmer()
@@ -183,7 +209,9 @@ namespace Agri_Energy_Connect.Controllers
             return View();
         }
 
-        // POST: Account/RegisterFarmer
+        /// <summary>
+        /// Handles Farmer registration POST, only accessible by Employees.
+        /// </summary>
         [HttpPost]
         [ValidateAntiForgeryToken]
         [Authorize(Roles = "Employee")]
@@ -227,7 +255,7 @@ namespace Agri_Energy_Connect.Controllers
                         // Attempt to deserialize API validation errors
                         var apiErrors = JsonConvert.DeserializeObject<Dictionary<string, string[]>>(responseContent);
 
-                        // if successful, add errors to ModelState
+                        // If successful, add errors to ModelState
                         if (apiErrors == null)
                         {
                             ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again.");
@@ -244,7 +272,7 @@ namespace Agri_Energy_Connect.Controllers
                     }
                     catch
                     {
-                        // If not in dictionary format, treat it as plain error
+                        // If not in dictionary format, treat as plain error
                         ModelState.AddModelError(string.Empty, responseContent);
                     }
                 }
@@ -257,7 +285,6 @@ namespace Agri_Energy_Connect.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, $"Unexpected error occurred while registering farmer with email: {model.EmailAddress}");
-
                 ModelState.AddModelError(string.Empty, "An unexpected error occurred. Please try again later.");
             }
 
