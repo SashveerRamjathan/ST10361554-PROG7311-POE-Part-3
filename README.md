@@ -108,7 +108,7 @@ Welcome to the **Agri-Energy Connect Platform** – a modern prototype for conne
 
 Watch a complete walkthrough of the Agri-Energy Connect Platform below:
 
-[Click here to open the demo video directly in your browser.](https://advtechonline-my.sharepoint.com/:v:/g/personal/st10361554_vcconnect_edu_za/Edx_H1TSdQVDqReBiklKWJgBz-zBD_6wDj-OM8_0bo3hxg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=G0M7Pe)
+[Click here to open the demo video directly in your browser.](https://advtechonline-my.sharepoint.com/:v:/g/personal/st10361554_vcconnect_edu_za/EQzm7M7ds6NMqz5lONIMl6wBvHQ-wZHm0NWaDLdp9yRUNg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=jpFeSp)
 
 ---
 
