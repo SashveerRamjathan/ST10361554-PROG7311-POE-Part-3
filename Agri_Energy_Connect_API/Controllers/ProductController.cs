@@ -6,6 +6,23 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
+/*
+    * Code Attribution
+    * Purpose: Implementing RESTful CRUD operations using ASP.NET Core Web API with Entity Framework Core for data persistence and authorization
+    * Author: Microsoft Documentation & Community Samples (adapted for Agri-Energy Connect)
+    * Date Accessed: 23 June 2025
+    * Source: Microsoft Learn - ASP.NET Core Web API & EF Core tutorials
+    * URL: https://learn.microsoft.com/en-us/aspnet/core/web-api/?view=aspnetcore-8.0
+ */
+
+/*
+    * Controller: ProductController
+    * Description: This controller provides CRUD and query operations for products, including filtering by category and farmer.
+    * It uses Entity Framework Core for data access and supports authorization for creating, updating, and deleting products.
+    * Each action logs requests, errors, and other significant events for traceability.
+    * All endpoints return appropriate HTTP status codes and error messages.
+ */
+
 namespace Agri_Energy_Connect_API.Controllers
 {
     [Route("api/[controller]")]
@@ -13,40 +30,46 @@ namespace Agri_Energy_Connect_API.Controllers
     public class ProductController : ControllerBase
     {
         private readonly ILogger<ProductController> _logger;
-
         private readonly ApplicationDbContext _context;
+
+        /// <summary>
+        /// Constructor for ProductController.
+        /// </summary>
+        /// <param name="context">Database context for data access.</param>
+        /// <param name="logger">Logger for diagnostic and trace logging.</param>
         public ProductController(ApplicationDbContext context, ILogger<ProductController> logger)
         {
             _context = context;
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieves all products with their associated category and farmer information.
+        /// </summary>
+        /// <returns>List of products as DTOs or 404 if none found.</returns>
         // GET: api/products/all
         [HttpGet("all")]
         public async Task<IActionResult> GetAllProducts()
         {
             try
             {
-                // log the request
                 _logger.LogInformation("Fetching all products.");
 
-                // get all products from the database
+                // Retrieve all products and include related navigation properties.
                 var products = await _context.Products
-                    .Include(p => p.Category) // Include the Category navigation property
-                    .Include(p => p.Farmer) // Include the Farmer navigation property
+                    .Include(p => p.Category)
+                    .Include(p => p.Farmer)
                     .ToListAsync();
 
-                // Check if the list is empty or null
                 if (products == null || products.Count == 0)
                 {
                     _logger.LogWarning("No products found.");
                     return NotFound("No products found.");
                 }
 
-                // log the number of products found
                 _logger.LogInformation($"Found {products.Count} products.");
 
-                // check navigation properties is not null, if null, return 404
+                // Validate navigation properties for each product.
                 foreach (var product in products)
                 {
                     if (product.Category == null || product.Farmer == null)
@@ -56,7 +79,7 @@ namespace Agri_Energy_Connect_API.Controllers
                     }
                 }
 
-                // convert the products to a list of ProductDtos
+                // Map products to DTOs.
                 var productDtos = products.Select(p => new ProductDto
                 {
                     Id = p.Id,
@@ -71,58 +94,55 @@ namespace Agri_Energy_Connect_API.Controllers
                     CategoryName = p.Category.Name
                 }).ToList();
 
-                // Return the list of products
                 return Ok(productDtos);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching products");
-
-                // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
 
+        /// <summary>
+        /// Retrieves a single product by its ID.
+        /// </summary>
+        /// <param name="id">Product ID.</param>
+        /// <returns>Product DTO or appropriate error status.</returns>
         // GET: api/products/{id}
         [HttpGet("{id}")]
         public async Task<IActionResult> GetProductById(string id)
         {
             try
             {
-                // log the request
                 _logger.LogInformation($"Fetching product with ID: {id}");
 
-                // Check if the ID is null or empty
                 if (string.IsNullOrEmpty(id))
                 {
                     _logger.LogWarning("Product ID is null or empty.");
-
                     return BadRequest("Product ID cannot be null or empty.");
                 }
 
-                // get the product from the database
+                // Retrieve product and related navigation properties.
                 var product = await _context.Products
-                    .Include(p => p.Category) // Include the Category navigation property
-                    .Include(p => p.Farmer) // Include the Farmer navigation property
+                    .Include(p => p.Category)
+                    .Include(p => p.Farmer)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
-                // Check if the product is null
                 if (product == null)
                 {
                     _logger.LogWarning($"Product with ID {id} not found.");
                     return NotFound($"Product with ID {id} not found.");
                 }
-                // log the product details
+
                 _logger.LogInformation($"Found product: {product.Name}");
 
-                // Check if the navigation properties are null
                 if (product.Category == null || product.Farmer == null)
                 {
                     _logger.LogWarning($"Product with ID {id} has null navigation properties.");
                     return NotFound($"Product with ID {id} has null navigation properties.");
                 }
 
-                // convert the product to a ProductDto
+                // Map to DTO.
                 var productDto = new ProductDto
                 {
                     Id = product.Id,
@@ -137,18 +157,21 @@ namespace Agri_Energy_Connect_API.Controllers
                     CategoryName = product.Category.Name!
                 };
 
-                // Return the product
                 return Ok(productDto);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching product");
-
-                // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
 
+        /// <summary>
+        /// Creates a new product.
+        /// Only users in the "Farmer" role are authorized to access this endpoint.
+        /// </summary>
+        /// <param name="product">Product creation view model.</param>
+        /// <returns>Newly created product ID or error status.</returns>
         // POST: api/Product
         [HttpPost]
         [Authorize(Roles = "Farmer")]
@@ -156,51 +179,42 @@ namespace Agri_Energy_Connect_API.Controllers
         {
             try
             {
-                // log the request
                 _logger.LogInformation($"Creating product: {product.Name}");
 
-                // Check if the product is null
                 if (product == null)
                 {
                     _logger.LogWarning("Product is null.");
                     return BadRequest("Product cannot be null.");
                 }
 
-                // Validate the model state
                 if (!ModelState.IsValid)
                 {
                     _logger.LogWarning("Invalid model state for product creation.");
                     return BadRequest(ModelState);
                 }
 
-                // Check if the Farmer ID is valid
+                // Validate Farmer ID.
                 var farmer = await _context.Users.FindAsync(product.FarmerId);
-
                 if (farmer == null)
                 {
                     _logger.LogWarning($"Farmer with ID {product.FarmerId} not found.");
                     return NotFound($"Farmer with ID {product.FarmerId} not found.");
                 }
-
-                // log the farmer details
                 _logger.LogInformation($"Farmer found: {farmer.FullName}");
 
-                // Check if the Category ID is valid
+                // Validate Category ID.
                 var category = await _context.Categories.FindAsync(product.CategoryId);
-
                 if (category == null)
                 {
                     _logger.LogWarning($"Category with ID {product.CategoryId} not found.");
                     return NotFound($"Category with ID {product.CategoryId} not found.");
                 }
-
-                // log the category details
                 _logger.LogInformation($"Category found: {category.Name}");
 
-                // Create a new product object
+                // Create and save new product.
                 var newProduct = new Product
                 {
-                    Id = Guid.NewGuid().ToString(), // Generate a new ID
+                    Id = Guid.NewGuid().ToString(),
                     Name = product.Name,
                     Description = product.Description,
                     Price = product.Price,
@@ -210,13 +224,9 @@ namespace Agri_Energy_Connect_API.Controllers
                     CategoryId = product.CategoryId
                 };
 
-                // Add the product to the database
                 await _context.Products.AddAsync(newProduct);
-
-                // Save changes to the database
                 await _context.SaveChangesAsync();
 
-                // log the product creation
                 _logger.LogInformation($"Product created with ID: {newProduct.Id}");
 
                 return Ok(new { id = newProduct.Id });
@@ -224,13 +234,17 @@ namespace Agri_Energy_Connect_API.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error creating product");
-                // Return a 500 Internal Server Error response
-
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
 
-
+        /// <summary>
+        /// Updates an existing product by ID.
+        /// Only authorized users may update products.
+        /// </summary>
+        /// <param name="id">Product ID.</param>
+        /// <param name="product">Product update view model.</param>
+        /// <returns>Updated product DTO or error status.</returns>
         // PUT: api/products/{id}
         [HttpPut("{id}")]
         [Authorize]
@@ -238,41 +252,35 @@ namespace Agri_Energy_Connect_API.Controllers
         {
             try
             {
-                // log the request
                 _logger.LogInformation($"Updating product with ID: {id}");
 
-                // Check if the ID is null or empty
                 if (string.IsNullOrEmpty(id))
                 {
                     _logger.LogWarning("Product ID is null or empty.");
                     return BadRequest("Product ID cannot be null or empty.");
                 }
 
-                // Check if the product is null
                 if (product == null)
                 {
                     _logger.LogWarning("Product is null.");
                     return BadRequest("Product cannot be null.");
                 }
 
-                // Validate the model state
                 if (!ModelState.IsValid)
                 {
                     _logger.LogWarning("Invalid model state for product update.");
                     return BadRequest(ModelState);
                 }
 
-                // get the product from the database
+                // Find existing product.
                 var existingProduct = await _context.Products.FindAsync(id);
-
-                // Check if the product exists
                 if (existingProduct == null)
                 {
                     _logger.LogWarning($"Product with ID {id} not found.");
                     return NotFound($"Product with ID {id} not found.");
                 }
 
-                // Update the product properties
+                // Update fields.
                 existingProduct.Name = product.Name;
                 existingProduct.Description = product.Description;
                 existingProduct.Price = product.Price;
@@ -280,30 +288,26 @@ namespace Agri_Energy_Connect_API.Controllers
                 existingProduct.ProductionDate = product.ProductionDate;
                 existingProduct.CategoryId = product.CategoryId;
 
-                // Save changes to the database
                 await _context.SaveChangesAsync();
 
-                // get the updated product from the database
+                // Reload with navigation properties.
                 existingProduct = await _context.Products
-                    .Include(p => p.Category) // Include the Category navigation property
-                    .Include(p => p.Farmer) // Include the Farmer navigation property
+                    .Include(p => p.Category)
+                    .Include(p => p.Farmer)
                     .FirstOrDefaultAsync(p => p.Id == id);
 
-                // Check if the updated product is null
                 if (existingProduct == null)
                 {
                     _logger.LogWarning($"Updated product with ID {id} not found.");
                     return NotFound($"Updated product with ID {id} not found.");
                 }
 
-                // Check if the navigation properties are null
                 if (existingProduct.Category == null || existingProduct.Farmer == null)
                 {
                     _logger.LogWarning($"Updated product with ID {id} has null navigation properties.");
                     return NotFound($"Updated product with ID {id} has null navigation properties.");
                 }
 
-                // convert the updated product to a ProductDto
                 var productDto = new ProductDto
                 {
                     Id = existingProduct.Id,
@@ -318,21 +322,23 @@ namespace Agri_Energy_Connect_API.Controllers
                     CategoryName = existingProduct.Category.Name!
                 };
 
-                // log the product update
                 _logger.LogInformation($"Product updated with ID: {existingProduct.Id}");
 
-                // Return the updated product
                 return Ok(productDto);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error updating product");
-
-                // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
 
+        /// <summary>
+        /// Deletes a product by ID.
+        /// Only authorized users can delete products.
+        /// </summary>
+        /// <param name="id">Product ID.</param>
+        /// <returns>Status of the delete operation.</returns>
         // DELETE: api/products/{id}
         [HttpDelete("{id}")]
         [Authorize]
@@ -340,47 +346,42 @@ namespace Agri_Energy_Connect_API.Controllers
         {
             try
             {
-                // log the request
                 _logger.LogInformation($"Deleting product with ID: {id}");
 
-                // Check if the ID is null or empty
                 if (string.IsNullOrEmpty(id))
                 {
                     _logger.LogWarning("Product ID is null or empty.");
                     return BadRequest("Product ID cannot be null or empty.");
                 }
 
-                // get the product from the database
                 var product = await _context.Products.FindAsync(id);
 
-                // Check if the product exists
                 if (product == null)
                 {
                     _logger.LogWarning($"Product with ID {id} not found.");
                     return NotFound($"Product with ID {id} not found.");
                 }
 
-                // Remove the product from the database
                 _context.Products.Remove(product);
-
-                // Save changes to the database
                 await _context.SaveChangesAsync();
 
-                // log the product deletion
                 _logger.LogInformation($"Product deleted with ID: {product.Id}");
 
-                // Return a success response
                 return Ok();
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error deleting product");
-
-                // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
 
+        /// <summary>
+        /// Retrieves products by category ID.
+        /// Only authorized users can access this endpoint.
+        /// </summary>
+        /// <param name="categoryId">Category ID.</param>
+        /// <returns>List of products or error status.</returns>
         // GET: api/products/category/{categoryId}
         [HttpGet("category/{categoryId}")]
         [Authorize]
@@ -388,31 +389,26 @@ namespace Agri_Energy_Connect_API.Controllers
         {
             try
             {
-                // log the request
                 _logger.LogInformation($"Fetching products for category ID: {categoryId}");
 
-                // Check if the category ID is null or empty
                 if (string.IsNullOrEmpty(categoryId))
                 {
                     _logger.LogWarning("Category ID is null or empty.");
                     return BadRequest("Category ID cannot be null or empty.");
                 }
 
-                // get the products from the database
                 var products = await _context.Products
-                    .Include(p => p.Category) // Include the Category navigation property
-                    .Include(p => p.Farmer) // Include the Farmer navigation property
+                    .Include(p => p.Category)
+                    .Include(p => p.Farmer)
                     .Where(p => p.CategoryId == categoryId)
                     .ToListAsync();
 
-                // Check if the list is empty or null
                 if (products == null || products.Count == 0)
                 {
                     _logger.LogWarning($"No products found for category ID {categoryId}.");
                     return NotFound($"No products found for category ID {categoryId}.");
                 }
 
-                // Check if the navigation properties are null
                 foreach (var product in products)
                 {
                     if (product.Category == null || product.Farmer == null)
@@ -422,7 +418,6 @@ namespace Agri_Energy_Connect_API.Controllers
                     }
                 }
 
-                // convert the products to a list of ProductDtos
                 var productDtos = products.Select(p => new ProductDto
                 {
                     Id = p.Id,
@@ -437,21 +432,23 @@ namespace Agri_Energy_Connect_API.Controllers
                     CategoryName = p.Category.Name!
                 }).ToList();
 
-                // log the number of products found
                 _logger.LogInformation($"Found {products.Count} products for category ID {categoryId}.");
 
-                // Return the list of products
                 return Ok(productDtos);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching products by category");
-
-                // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
 
+        /// <summary>
+        /// Retrieves products by farmer ID.
+        /// Only authorized users can access this endpoint.
+        /// </summary>
+        /// <param name="farmerId">Farmer ID.</param>
+        /// <returns>List of products or error status.</returns>
         // GET: api/products/farmer/{farmerId}
         [HttpGet("farmer/{farmerId}")]
         [Authorize]
@@ -459,31 +456,26 @@ namespace Agri_Energy_Connect_API.Controllers
         {
             try
             {
-                // log the request
                 _logger.LogInformation($"Fetching products for farmer ID: {farmerId}");
 
-                // Check if the farmer ID is null or empty
                 if (string.IsNullOrEmpty(farmerId))
                 {
                     _logger.LogWarning("Farmer ID is null or empty.");
                     return BadRequest("Farmer ID cannot be null or empty.");
                 }
 
-                // get the products from the database
                 var products = await _context.Products
-                    .Include(p => p.Category) // Include the Category navigation property
-                    .Include(p => p.Farmer) // Include the Farmer navigation property
+                    .Include(p => p.Category)
+                    .Include(p => p.Farmer)
                     .Where(p => p.FarmerId == farmerId)
                     .ToListAsync();
 
-                // Check if the list is empty or null
                 if (products == null || products.Count == 0)
                 {
                     _logger.LogWarning($"No products found for farmer ID {farmerId}.");
                     return NotFound($"No products found for farmer ID {farmerId}.");
                 }
 
-                // Check if the navigation properties are null
                 foreach (var product in products)
                 {
                     if (product.Category == null || product.Farmer == null)
@@ -493,7 +485,6 @@ namespace Agri_Energy_Connect_API.Controllers
                     }
                 }
 
-                // convert the products to a list of ProductDtos
                 var productDtos = products.Select(p => new ProductDto
                 {
                     Id = p.Id,
@@ -508,18 +499,13 @@ namespace Agri_Energy_Connect_API.Controllers
                     CategoryName = p.Category.Name!
                 }).ToList();
 
-                // log the number of products found
                 _logger.LogInformation($"Found {products.Count} products for farmer ID {farmerId}.");
 
-                // Return the list of products
                 return Ok(productDtos);
-
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error fetching products by farmer");
-
-                // Return a 500 Internal Server Error response
                 return StatusCode(StatusCodes.Status500InternalServerError, "Internal server error");
             }
         }
