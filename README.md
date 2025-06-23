@@ -10,12 +10,13 @@ Welcome to the **Agri-Energy Connect Platform** – a modern prototype for conne
 2. [✨ Key Features](#key-features)
 3. [🏛️ Architecture](#architecture)
 4. [🗃️ Database & Scripts](#database--scripts)
-5. [⚡ Quick Start Guide](#quick-start-guide)
+5. [🔑 Account Credentials (Demo)](#account-credentials-demo)
+6. [⚡ Quick Start Guide](#quick-start-guide)
     - [Clone the Repo](#clone-the-repo)
     - [Run in Visual Studio](#run-in-visual-studio)
     - [Run via Command Line](#run-via-command-line)
-6. [💡 Part 2 Feedback Implementation](#part-2-feedback-implementation)
-7. [👥 Contributors](#contributors)
+7. [💡 Part 2 Feedback Implementation](#part-2-feedback-implementation)
+8. [👥 Contributors](#contributors)
 
 ---
 
@@ -78,6 +79,27 @@ Welcome to the **Agri-Energy Connect Platform** – a modern prototype for conne
 - The SQLite file is located at:  
   `/AgriEnergyConnect.API/App_Data/AgriEnergyConnect.db`
 - Use any SQLite browser to view data or reset as needed.
+
+---
+
+## 🔑 Account Credentials (Demo)
+
+> Use these demo credentials to log into the platform as either an employee or a farmer.
+
+### Agri-Energy Connect Employee Credentials
+
+- **Email:** `employee@agrienergy.com`
+- **Password:** `Password123!`
+
+### Farmer User Credentials
+
+1. **Farmer 1**
+   - **Email:** `johndoe@mail.com`
+   - **Password:** `Johndoe123$`
+
+2. **Farmer 2**
+   - **Email:** `thabo@mail.com`
+   - **Password:** `Thabo@2025!`
 
 ---
 
