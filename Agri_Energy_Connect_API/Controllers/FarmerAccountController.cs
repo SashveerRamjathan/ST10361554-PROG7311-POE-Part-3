@@ -19,7 +19,6 @@ using Microsoft.AspNetCore.Mvc;
     * Description: This controller manages CRUD operations for Farmer accounts using ASP.NET Core Identity.
     * Only users with the "Employee" role are authorized to access these endpoints.
     * Logging is included for traceability of actions and errors.
-    * No business logic is changed, only documentation and attribution are added.
  */
 
 namespace Agri_Energy_Connect_API.Controllers

@@ -20,7 +20,6 @@ using Microsoft.EntityFrameworkCore;
     * Description: Provides CRUD operations for product categories. Utilizes Entity Framework Core for data access.
     * Includes endpoints for retrieving, creating, and deleting categories with proper logging and error handling.
     * Authorization is enforced for sensitive operations.
-    * All logic remains unchanged, only documentation and attribution were added.
  */
 
 namespace Agri_Energy_Connect_API.Controllers

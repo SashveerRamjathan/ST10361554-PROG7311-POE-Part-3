@@ -20,7 +20,6 @@ using Microsoft.AspNetCore.Mvc;
     * Description: This controller provides endpoints for registration and authentication of Farmers and Employees.
     * Utilizes ASP.NET Core Identity for user and role management and issues JWT tokens for authenticated users.
     * Logging is included for traceability and error diagnostics.
-    * No business logic is changed, only documentation and attribution are added.
  */
 
 namespace Agri_Energy_Connect_API.Controllers

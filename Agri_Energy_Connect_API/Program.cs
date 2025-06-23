@@ -21,7 +21,6 @@ using System.Text;
     * Description: Configures services, middleware, and dependency injection for the web API, including
     * Entity Framework Core, Identity, authentication/authorization with JWT, and Swagger/OpenAPI.
     * Seeds roles and a default admin user at startup.
-    * No application logic is changed, only documentation and attribution are added.
  */
 
 namespace Agri_Energy_Connect_API
