@@ -11,12 +11,13 @@ Welcome to the **Agri-Energy Connect Platform** – a modern prototype for conne
 3. [🏛️ Architecture](#architecture)
 4. [🗃️ Database & Scripts](#database--scripts)
 5. [🔑 Account Credentials (Demo)](#account-credentials-demo)
-6. [⚡ Quick Start Guide](#quick-start-guide)
+6. [🎥 Demo Video](#demo-video)
+7. [⚡ Quick Start Guide](#quick-start-guide)
     - [Clone the Repo](#clone-the-repo)
     - [Run in Visual Studio](#run-in-visual-studio)
     - [Run via Command Line](#run-via-command-line)
-7. [💡 Part 2 Feedback Implementation](#part-2-feedback-implementation)
-8. [👥 Contributors](#contributors)
+8. [💡 Part 2 Feedback Implementation](#part-2-feedback-implementation)
+9. [👥 Contributors](#contributors)
 
 ---
 
@@ -100,6 +101,14 @@ Welcome to the **Agri-Energy Connect Platform** – a modern prototype for conne
 2. **Farmer 2**
    - **Email:** `thabo@mail.com`
    - **Password:** `Thabo@2025!`
+
+---
+
+## 🎥 Demo Video
+
+Watch a complete walkthrough of the Agri-Energy Connect Platform below:
+
+[Click here to open the demo video directly in your browser.](https://advtechonline-my.sharepoint.com/:v:/g/personal/st10361554_vcconnect_edu_za/Edx_H1TSdQVDqReBiklKWJgBz-zBD_6wDj-OM8_0bo3hxg?nav=eyJyZWZlcnJhbEluZm8iOnsicmVmZXJyYWxBcHAiOiJPbmVEcml2ZUZvckJ1c2luZXNzIiwicmVmZXJyYWxBcHBQbGF0Zm9ybSI6IldlYiIsInJlZmVycmFsTW9kZSI6InZpZXciLCJyZWZlcnJhbFZpZXciOiJNeUZpbGVzTGlua0NvcHkifX0&e=G0M7Pe)
 
 ---
 
